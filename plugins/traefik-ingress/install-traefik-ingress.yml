@@ -1,0 +1,23 @@
+# 部署traefik-ingress服务
+---
+- hosts: "k8s-cli"
+  vars_files:
+  - "../../config/config.yml"
+  tasks:
+  - name: "mkdir /opt/k8s/traefik-ingress"
+    file:
+      path: "/opt/k8s/traefik-ingress"
+      state: directory
+  - name: "copy files to k8s-cli"
+    template:
+      src: "{{item}}"
+      dest: "/opt/k8s/traefik-ingress/"
+    with_items:
+    - "traefik-ingress.yaml"
+    - "traefik-ui.yaml"
+  - name: "create traefik-ingress"
+    shell: "cd /opt/k8s/traefik-ingress/ && kubectl --kubeconfig /etc/kubernetes/kubeconfig create -f ."
+    register: result
+  - name: "create result"
+    debug:
+      msg: "{{result.stdout}}"

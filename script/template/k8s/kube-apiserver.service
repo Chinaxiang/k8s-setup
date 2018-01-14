@@ -1,0 +1,28 @@
+[Unit]
+Description=Kubernetes API Service
+Documentation=https://github.com/kubernetes
+After=network.target
+
+[Service]
+Type=notify
+EnvironmentFile=-/etc/kubernetes/config
+EnvironmentFile=-/etc/kubernetes/apiserver
+ExecStart=/usr/bin/kube-apiserver \
+    $KUBE_LOG_DIR \
+    $KUBE_LOGTOSTDERR \
+    $KUBE_LOG_LEVEL \
+    $KUBE_ALLOW_PRIV \
+    $KUBE_ADDRESS \
+    $KUBE_ETCD \
+    $KUBE_SERVICE_ADDRESSES \
+    $KUBE_ADMISSION_CONTROL \
+    $KUBE_AUDIT \
+    $KUBE_AUTH \
+    $KUBE_TLS \
+    $KUBE_ARGS
+Restart=on-failure
+RestartSec=5
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,39 @@
+# 生成集群需要的证书并拷贝到目标机器
+---
+- hosts: "k8s-cli"
+  vars_files:
+  - "../config/config.yml"
+  vars: 
+    os: "linux"
+  tasks:
+  - name: "copy cfssl to /usr/bin/"
+    copy:
+      src: "../sbin/{{item}}"
+      dest: "/usr/bin/"
+      mode: 0755
+    with_items:
+    - "cfssl"
+    - "cfssljson"
+    - "cfssl-certinfo"
+    when: os == "linux"
+  - name: "mkdir /etc/kubernetes/ssl"
+    file:
+      path: "/etc/kubernetes/ssl"
+      state: directory
+  - name: "copy tls config files to /etc/kubernetes/ssl"
+    template:
+      src: "template/ssl/{{item}}"
+      dest: "/etc/kubernetes/ssl/"
+    with_items:
+    - "ca-csr.json"
+    - "ca-config.json"
+    - "kubernetes-csr.json"
+    - "admin-csr.json"
+  - block:
+    - shell: "cd /etc/kubernetes/ssl && cfssl gencert -initca ca-csr.json | cfssljson -bare ca"
+    - shell: "cd /etc/kubernetes/ssl && cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes kubernetes-csr.json | cfssljson -bare kubernetes"
+    - shell: "cd /etc/kubernetes/ssl && cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes admin-csr.json | cfssljson -bare admin"
+  - name: "scp tls files to dest"
+    shell: "scp -r /etc/kubernetes/ssl {{ansible_user}}@{{item}}:/etc/kubernetes/"
+    with_items:
+    - "{{tls.dest}}"

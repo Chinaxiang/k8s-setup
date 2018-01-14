@@ -1,0 +1,22 @@
+# 部署heapster服务
+---
+- hosts: "k8s-cli"
+  vars_files:
+  - "../../config/config.yml"
+  tasks:
+  - name: "mkdir /opt/k8s/heapster"
+    file:
+      path: "/opt/k8s/heapster"
+      state: directory
+  - name: "copy files to k8s-cli"
+    template:
+      src: "{{item}}"
+      dest: "/opt/k8s/heapster/"
+    with_items:
+    - "heapster.yaml"
+  - name: "create heapster"
+    shell: "cd /opt/k8s/heapster/ && kubectl --kubeconfig /etc/kubernetes/kubeconfig create -f ."
+    register: result
+  - name: "create result"
+    debug:
+      msg: "{{result.stdout}}"

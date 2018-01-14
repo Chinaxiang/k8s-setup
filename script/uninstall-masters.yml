@@ -1,0 +1,39 @@
+# 卸载masters
+---
+- hosts: "k8s-masters"
+  vars_files:
+  - "../config/config.yml"
+  tasks:
+  - service: 
+      name: kube-scheduler
+      state: stopped
+    ignore_errors: true 
+  - service: 
+      name: kube-scheduler
+      enabled: no
+    ignore_errors: true 
+  - service: 
+      name: kube-controller-manager
+      state: stopped
+    ignore_errors: true 
+  - service: 
+      name: kube-controller-manager
+      enabled: no
+    ignore_errors: true 
+  - service: 
+      name: kube-apiserver
+      state: stopped
+    ignore_errors: true 
+  - service: 
+      name: kube-apiserver
+      enabled: no
+    ignore_errors: true 
+  - shell: rm -rf /var/log/kubernetes
+  - shell: rm -rf /etc/kubernetes
+  - shell: rm -rf /usr/bin/kube-apiserver
+  - shell: rm -rf /usr/bin/kube-controller-manager
+  - shell: rm -rf /usr/bin/kube-scheduler
+  - shell: rm -rf /usr/bin/kubectl
+  - shell: rm -rf /lib/systemd/system/kube-apiserver.service
+  - shell: rm -rf /lib/systemd/system/kube-controller-manager.service
+  - shell: rm -rf /lib/systemd/system/kube-scheduler.service

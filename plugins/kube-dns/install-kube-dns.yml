@@ -1,0 +1,20 @@
+# 部署kube-dns服务
+---
+- hosts: "k8s-cli"
+  vars_files:
+  - "../../config/config.yml"
+  tasks:
+  - name: "mkdir /opt/k8s/kube-dns"
+    file:
+      path: "/opt/k8s/kube-dns"
+      state: directory
+  - name: "copy files to k8s-cli"
+    template:
+      src: "kube-dns.yaml"
+      dest: "/opt/k8s/kube-dns/"
+  - name: "create kube-dns"
+    shell: "cd /opt/k8s/kube-dns/ && kubectl --kubeconfig /etc/kubernetes/kubeconfig create -f ."
+    register: result
+  - name: "create result"
+    debug:
+      msg: "{{result.stdout}}"

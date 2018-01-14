@@ -1,0 +1,47 @@
+# 安装etcd集群
+---
+- hosts: "etcd"
+  vars_files:
+  - "../config/config.yml"
+  tasks:
+  - name: "mkdir /var/lib/etcd"
+    file:
+      path: "/var/lib/etcd"
+      state: directory
+  - name: "mkdir /etc/etcd"
+    file:
+      path: "/etc/etcd"
+      state: directory
+  - name: "copy files to etcd cluster"
+    copy:
+      src: "{{item.src}}"
+      dest: "{{item.dest}}"
+      mode: 0755
+    with_items:
+    - src: "../sbin/etcd"
+      dest: "/usr/bin/"
+    - src: "../sbin/etcdctl"
+      dest: "/usr/bin/"
+    - src: "template/etcd/etcd.service"
+      dest: "/lib/systemd/system/"
+  - name: "template files to etcd cluster"
+    template:
+      src: "{{item.src}}"
+      dest: "{{item.dest}}"
+    with_items:
+    - src: "template/etcd/etcd.conf"
+      dest: "/etc/etcd/"
+  - block:
+    - shell: systemctl daemon-reload
+    - service: 
+        name: etcd
+        enabled: yes
+    - service: 
+        name: etcd
+        state: restarted
+    - shell: systemctl status etcd
+      register: result
+    - debug:
+        msg: "{{result.stdout}}"
+  - name: "set k8s network config"
+    shell: etcdctl set /k8s/network/config '{"Network":"{{k8s.cluster_cidr}}","SubnetLen":24,"Backend":{"Type":"vxlan"}}'

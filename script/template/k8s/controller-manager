@@ -1,0 +1,3 @@
+KUBE_TLS="--root-ca-file=/etc/kubernetes/ssl/ca.pem --cluster-signing-cert-file=/etc/kubernetes/ssl/ca.pem --cluster-signing-key-file=/etc/kubernetes/ssl/ca-key.pem --service-account-private-key-file=/etc/kubernetes/ssl/ca-key.pem"
+KUBE_CONFIG="--master=127.0.0.1:8080"
+KUBE_ARGS="--cluster-name=kubernetes --cluster-cidr={{k8s.cluster_cidr}} --leader-elect=true --service-cluster-ip-range={{k8s.cluster_ip_range}}"

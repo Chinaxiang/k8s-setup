@@ -1,0 +1,8 @@
+#配置日志输出路径
+KUBE_LOG_DIR="--log-dir=/var/log/kubernetes"
+#不将日志输出到stderr
+KUBE_LOGTOSTDERR="--logtostderr=false"
+#配置日志级别0:debug
+KUBE_LOG_LEVEL="--v=2"
+#允许k8s运行拥有系统特权的容器
+KUBE_ALLOW_PRIV="--allow-privileged=true"

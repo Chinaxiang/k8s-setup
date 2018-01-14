@@ -1,0 +1,8 @@
+# gitignore
+.DS_Store
+*.tar
+*.deb
+*.zip
+*.retry
+sbin/*
+!sbin/README.md

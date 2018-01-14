@@ -1,0 +1,38 @@
+---
+- hosts: "k8s-cli"
+  tasks:
+  - name: "delete deploy"
+    shell: "kubectl --kubeconfig /etc/kubernetes/kubeconfig delete deploy --all \
+            && kubectl --kubeconfig /etc/kubernetes/kubeconfig delete deploy --all -n kube-system"
+    register: result
+  - name: "create result"
+    debug:
+      msg: "{{result.stdout}}"
+  - name: "delete svc"
+    shell: "kubectl --kubeconfig /etc/kubernetes/kubeconfig delete svc --all \
+            && kubectl --kubeconfig /etc/kubernetes/kubeconfig delete svc --all -n kube-system"
+    register: result
+  - name: "create result"
+    debug:
+      msg: "{{result.stdout}}"
+  - name: "delete ds"
+    shell: "kubectl --kubeconfig /etc/kubernetes/kubeconfig delete ds --all \
+            && kubectl --kubeconfig /etc/kubernetes/kubeconfig delete ds --all -n kube-system"
+    register: result
+  - name: "create result"
+    debug:
+      msg: "{{result.stdout}}"
+  - name: "delete cm"
+    shell: "kubectl --kubeconfig /etc/kubernetes/kubeconfig delete cm --all \
+            && kubectl --kubeconfig /etc/kubernetes/kubeconfig delete cm --all -n kube-system"
+    register: result
+  - name: "create result"
+    debug:
+      msg: "{{result.stdout}}"
+  - name: "delete sa"
+    shell: "kubectl --kubeconfig /etc/kubernetes/kubeconfig delete sa --all \
+            && kubectl --kubeconfig /etc/kubernetes/kubeconfig delete sa --all -n kube-system"
+    register: result
+  - name: "create result"
+    debug:
+      msg: "{{result.stdout}}"

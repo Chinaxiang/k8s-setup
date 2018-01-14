@@ -1,0 +1,18 @@
+# 卸载etcd
+---
+- hosts: "etcd"
+  vars_files:
+  - "../config/config.yml"
+  tasks:
+  - service: 
+      name: etcd
+      state: stopped
+    ignore_errors: true 
+  - service: 
+      name: etcd
+      enabled: no
+    ignore_errors: true 
+  - shell: rm -rf /etc/etcd
+  - shell: rm -rf /var/lib/etcd
+  - shell: rm -rf /lib/systemd/system/etcd.service
+  - shell: rm -rf /usr/bin/etcd*

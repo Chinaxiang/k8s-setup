@@ -1,0 +1,19 @@
+# 卸载flanneld
+---
+- hosts: "k8s"
+  vars_files:
+  - "../config/config.yml"
+  tasks:
+  - service: 
+      name: flanneld
+      state: stopped
+    ignore_errors: true 
+  - service: 
+      name: flanneld
+      enabled: no
+    ignore_errors: true 
+  - shell: rm -rf /etc/sysconfig/flanneld
+  - shell: rm -rf /run/flannel
+  - shell: rm -rf /lib/systemd/system/flanneld.service
+  - shell: rm -rf /usr/bin/flanneld
+  - shell: rm -rf /usr/bin/mk-docker-opts.sh

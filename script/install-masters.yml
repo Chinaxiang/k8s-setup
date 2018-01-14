@@ -1,0 +1,83 @@
+---
+- hosts: "k8s-masters"
+  vars_files:
+  - "../config/config.yml"
+  tasks:
+  - name: "copy files to masters"
+    copy:
+      src: "{{item.src}}"
+      dest: "{{item.dest}}"
+      mode: 0755
+    with_items:
+    - src: "../sbin/kube-apiserver"
+      dest: "/usr/bin/"
+    - src: "../sbin/kube-controller-manager"
+      dest: "/usr/bin/"
+    - src: "../sbin/kube-scheduler"
+      dest: "/usr/bin/"
+    - src: "../sbin/kubectl"
+      dest: "/usr/bin/"
+    - src: "template/k8s/kube-apiserver.service"
+      dest: "/lib/systemd/system/"
+    - src: "template/k8s/kube-controller-manager.service"
+      dest: "/lib/systemd/system/"
+    - src: "template/k8s/kube-scheduler.service"
+      dest: "/lib/systemd/system/"
+    - src: "template/k8s/basic.csv"
+      dest: "/etc/kubernetes/"
+    - src: "template/k8s/token.csv"
+      dest: "/etc/kubernetes/"
+  - name: "template files to masters"
+    template:
+      src: "{{item.src}}"
+      dest: "{{item.dest}}"
+    with_items:
+    - src: "template/k8s/config"
+      dest: "/etc/kubernetes/"
+    - src: "template/k8s/apiserver"
+      dest: "/etc/kubernetes/"
+    - src: "template/k8s/controller-manager"
+      dest: "/etc/kubernetes/"
+    - src: "template/k8s/scheduler"
+      dest: "/etc/kubernetes/"
+  - block:
+    - shell: systemctl daemon-reload
+    - service: 
+        name: kube-apiserver
+        enabled: yes
+    - service: 
+        name: kube-apiserver
+        state: restarted
+    - shell: systemctl status kube-apiserver
+      register: result
+    - debug:
+        msg: "{{result.stdout}}"
+  - block:
+    - shell: "kubectl config set-cluster kubernetes --certificate-authority=/etc/kubernetes/ssl/ca.pem --embed-certs=true --server=https://{{k8s.apiserver}}:6443 --kubeconfig=/etc/kubernetes/kubeconfig"
+    - shell: "kubectl config set-credentials admin --client-certificate=/etc/kubernetes/ssl/admin.pem --client-key=/etc/kubernetes/ssl/admin-key.pem --embed-certs=true --kubeconfig=/etc/kubernetes/kubeconfig"
+    - shell: "kubectl config set-context kubernetes --cluster=kubernetes --user=admin --kubeconfig=/etc/kubernetes/kubeconfig"
+    - shell: "kubectl config use-context kubernetes --kubeconfig=/etc/kubernetes/kubeconfig"
+  - block:
+    - shell: systemctl daemon-reload
+    - service: 
+        name: kube-controller-manager
+        enabled: yes
+    - service: 
+        name: kube-controller-manager
+        state: restarted
+    - shell: systemctl status kube-controller-manager
+      register: result
+    - debug:
+        msg: "{{result.stdout}}"
+  - block:
+    - shell: systemctl daemon-reload
+    - service: 
+        name: kube-scheduler
+        enabled: yes
+    - service: 
+        name: kube-scheduler
+        state: restarted
+    - shell: systemctl status kube-scheduler
+      register: result
+    - debug:
+        msg: "{{result.stdout}}"
