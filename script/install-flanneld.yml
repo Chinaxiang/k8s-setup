@@ -8,13 +8,13 @@
     file:
       path: "/etc/sysconfig"
       state: directory
-    when: k8s.network == flannel
+    when: k8s.network == "flannel"
   - name: "copy files to all k8s nodes"
     copy:
       src: "{{item.src}}"
       dest: "{{item.dest}}"
       mode: 0755
-    when: k8s.network == flannel
+    when: k8s.network == "flannel"
     with_items:
     - src: "../sbin/flanneld"
       dest: "/usr/bin/"
@@ -26,7 +26,7 @@
     template:
       src: "{{item.src}}"
       dest: "{{item.dest}}"
-    when: k8s.network == flannel
+    when: k8s.network == "flannel"
     with_items:
     - src: "template/flannel/flanneld"
       dest: "/etc/sysconfig/"
@@ -42,4 +42,4 @@
       register: result
     - debug:
         msg: "{{result.stdout}}"
-    when: k8s.network == flannel
+    when: k8s.network == "flannel"

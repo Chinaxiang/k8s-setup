@@ -8,16 +8,16 @@
       name: flanneld
       state: stopped
     ignore_errors: true 
-    when: k8s.network == flannel
+    when: k8s.network == "flannel"
   - service: 
       name: flanneld
       enabled: no
     ignore_errors: true
-    when: k8s.network == flannel
+    when: k8s.network == "flannel"
   - block:  
     - shell: rm -rf /etc/sysconfig/flanneld
     - shell: rm -rf /run/flannel
     - shell: rm -rf /lib/systemd/system/flanneld.service
     - shell: rm -rf /usr/bin/flanneld
     - shell: rm -rf /usr/bin/mk-docker-opts.sh
-    when: k8s.network == flannel
+    when: k8s.network == "flannel"

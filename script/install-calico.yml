@@ -8,13 +8,13 @@
     file:
       path: "/etc/cni/net.d"
       state: directory
-    when: k8s.network == calico
+    when: k8s.network == "calico"
   - name: "copy files to all nodes"
     copy:
       src: "{{item.src}}"
       dest: "{{item.dest}}"
       mode: 0755
-    when: k8s.network == calico
+    when: k8s.network == "calico"
     with_items:
     - src: "../sbin/calico"
       dest: "/usr/bin/"
@@ -28,7 +28,7 @@
     template:
       src: "{{item.src}}"
       dest: "{{item.dest}}"
-    when: k8s.network == calico
+    when: k8s.network == "calico"
     with_items:
     - src: "template/calico/10-calico.conf"
       dest: "/etc/cni/net.d/"
@@ -46,4 +46,4 @@
       register: result
     - debug:
         msg: "{{result.stdout}}"
-    when: k8s.network == calico
+    when: k8s.network == "calico"
