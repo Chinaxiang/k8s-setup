@@ -74,6 +74,14 @@ ansible-playbook -i config/hosts script/uninstall-masters.yml
 h2 "[Step $item]: uninstall etcd cluster ..."; let item+=1
 ansible-playbook -i config/hosts script/uninstall-etcd.yml
 
+h2 "[Step $item]: uninstall calico ..."; let item+=1
+ansible-playbook -i config/hosts script/uninstall-calico.yml
+
+h2 "[Step $item]: uninstall flannel ..."; let item+=1
+ansible-playbook -i config/hosts script/uninstall-flanneld.yml
+
+h2 "[Step $item]: uninstall docker ..."; let item+=1
+ansible-playbook -i config/hosts script/uninstall-docker.yml
 
 success "Uninstall Finished."
 

@@ -9,9 +9,6 @@
     copy: 
       src: "template/hosts"
       dest: "/etc/hosts"
-  - name: "install dependency"
-    shell: "apt-get -y install conntrack"
-    ignore_errors: true
   - name: "apt clean"
     shell: "apt-get -y purge ufw lxd lxd-client lxcfs lxc-common && apt-get clean"
     ignore_errors: true 

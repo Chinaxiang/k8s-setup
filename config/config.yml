@@ -8,13 +8,15 @@ k8s:
   apiserver: "10.211.55.12"
   apiservercount: 1
   iface: "enp0s5"
-  insecure_registries: '["192.168.0.105:5000"]'
+  insecure_registries: '["192.168.0.105:5000", "10.255.1.101"]'
+  network: calico
   cluster_ip_range: 10.1.0.0/16
   cluster_dns: 10.1.0.2
   cluster_svc: 10.1.0.1
   cluster_cidr: 172.20.0.0/16
 # 私有仓库信息
 docker_hub:
+  # ip: 10.255.1.101
   ip: 192.168.0.105:5000
 # etcd集群配置信息
 etcd:

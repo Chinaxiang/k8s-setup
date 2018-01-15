@@ -39,20 +39,15 @@ note() { printf "${underline}${bold}${blue}Note:${reset} ${blue}%s${reset}\n" "$
 set -e
 set +o noglob
 
-usage=$'Please set config.yml and hosts to fit for your env.'
+usage=$'Please read the README.md'
 item=0
-
-# install ansible
-function install_ansible {
-	bash bin/ansible/hacking/env-setup
-}
 
 # check ansible
 function check_ansible {
 	if ! ansible-playbook --version &> /dev/null
 	then
 		error "Need to install ansible(2.4.x+) first and run this script again."
-		install_ansible
+		exit 1
 	fi
 	
 	# ansible has been installed and check its version
@@ -66,13 +61,13 @@ function check_ansible {
         if [ "$ansible_version_part1" -lt 2 ] || ([ "$ansible_version_part1" -eq 2 ] && [ "$ansible_version_part2" -lt 4 ])
         then
             error "Need to upgrade ansible_version package to 2.4.x+."
-            install_ansible
+            exit 1
         else
             note "ansible version: $ansible_version"
         fi
 	else
 		error "Failed to parse ansible version."
-		install_ansible
+		exit 1
 	fi
 }
 
@@ -110,17 +105,16 @@ done
 
 note "This script will install components:
 1.Install k8s cluster(eg. etcd, cni, kubernetes, docker)
-2.Install Docker Hub
-3.Install CoreDNS plugin
-4.Install Kubernetes Dashboard plugin
-5.Install Heapster Monitor plugin
-6.Install Traefik Ingress plugin"
+2.Install CoreDNS plugin
+3.Install Kubernetes Dashboard plugin
+4.Install Heapster Monitor plugin
+5.Install Traefik Ingress plugin"
 
 
 h2 "[Step $item]: checking installation environment ..."; let item+=1
 check_ansible
 
-h2 "[Step $item]: prepare k8s nodes ..."; let item+=1
+h2 "[Step $item]: prepare k8s cluster ..."; let item+=1
 ansible-playbook -i config/hosts script/prepare-k8s.yml
 
 h2 "[Step $item]: prepare tls files ..."; let item+=1
@@ -129,8 +123,17 @@ ansible-playbook -i config/hosts script/install-tls.yml
 h2 "[Step $item]: install etcd cluster ..."; let item+=1
 ansible-playbook -i config/hosts script/install-etcd.yml
 
+h2 "[Step $item]: install flannel ..."; let item+=1
+ansible-playbook -i config/hosts script/install-flanneld.yml
+
+h2 "[Step $item]: install docker ..."; let item+=1
+ansible-playbook -i config/hosts script/install-docker.yml
+
 h2 "[Step $item]: install calico ..."; let item+=1
 ansible-playbook -i config/hosts script/install-calico.yml
+
+note "waiting for init network ..."
+sleep 30s
 
 h2 "[Step $item]: install masters ..."; let item+=1
 ansible-playbook -i config/hosts script/install-masters.yml
@@ -140,7 +143,7 @@ ansible-playbook -i config/hosts script/install-nodes.yml
 
 note "Begin install plugins."
 
-h2 "[Step $item]: install calico ..."; let item+=1
+h2 "[Step $item]: install calico controller ..."; let item+=1
 ansible-playbook -i config/hosts plugins/calico/install-calico.yml
 
 h2 "[Step $item]: install coredns ..."; let item+=1

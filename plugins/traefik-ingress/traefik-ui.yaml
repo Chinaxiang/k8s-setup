@@ -18,7 +18,7 @@ metadata:
   namespace: kube-system
 spec:
   rules:
-  - host: traefik-ui2.testk8s.com
+  - host: traefik-ui.testk8s.com
     http:
       paths:
       - path: /

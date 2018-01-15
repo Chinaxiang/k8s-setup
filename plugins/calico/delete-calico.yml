@@ -25,12 +25,3 @@
     ignore_errors: true 
   - name: "delete files"
     shell: "rm -rf /opt/k8s/calico"
-
-- hosts: "k8s-nodes"
-  tasks:
-  - name: "delete files"
-    shell: "rm -rf /etc/cni \
-            && rm -rf /usr/bin/calico \
-            && rm -rf /usr/bin/flannel \
-            && rm -rf /usr/bin/portmap \
-            && rm -rf /usr/bin/calico-ipam"

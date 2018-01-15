@@ -1,6 +1,6 @@
 # 配置calico虚拟网络
 ---
-- hosts: "all"
+- hosts: "k8s-all"
   vars_files:
   - "../config/config.yml"
   tasks:
@@ -8,15 +8,13 @@
     file:
       path: "/etc/cni/net.d"
       state: directory
-  - name: "mkdir /etc/calico"
-    file:
-      path: "/etc/calico"
-      state: directory
+    when: k8s.network == calico
   - name: "copy files to all nodes"
     copy:
       src: "{{item.src}}"
       dest: "{{item.dest}}"
       mode: 0755
+    when: k8s.network == calico
     with_items:
     - src: "../sbin/calico"
       dest: "/usr/bin/"
@@ -26,46 +24,16 @@
       dest: "/usr/bin/"
     - src: "../sbin/calicoctl"
       dest: "/usr/bin/"
-    - src: "../sbin/docker-ce_17.03.2-ce-0-ubuntu-xenial_amd64.deb"
-      dest: "/opt/"
-    - src: "../sbin/libltdl7_2.4.6-0.1_amd64.deb"
-      dest: "/opt/"
   - name: "template files to all nodes"
     template:
       src: "{{item.src}}"
       dest: "{{item.dest}}"
+    when: k8s.network == calico
     with_items:
     - src: "template/calico/10-calico.conf"
       dest: "/etc/cni/net.d/"
     - src: "template/calico/calico-node.service"
       dest: "/lib/systemd/system/"
-  - block:
-    - shell: dpkg -i /opt/libltdl7_2.4.6-0.1_amd64.deb
-    - shell: dpkg -i /opt/docker-ce_17.03.2-ce-0-ubuntu-xenial_amd64.deb
-    ignore_errors: true 
-  - name: "copy daemon.json to /etc/docker/"
-    template:
-      src: "template/docker/daemon.json"
-      dest: "/etc/docker/"
-  - name: "copy docker.service to /lib/systemd/system/"
-    copy:
-      src: "template/docker/docker.service"
-      dest: "/lib/systemd/system/"
-  - name: "iptables setting"
-    shell: "iptables -F && iptables -X \
-            && iptables -F -t nat && iptables -X -t nat \
-            && iptables -F -t raw && iptables -X -t raw \
-            && iptables -F -t mangle && iptables -X -t mangle \
-            && iptables -P FORWARD ACCEPT"
-  - block:
-    - shell: systemctl daemon-reload
-    - service: 
-        name: docker
-        state: restarted
-    - shell: systemctl status docker
-      register: result
-    - debug:
-        msg: "{{result.stdout}}"
   - block:
     - shell: systemctl daemon-reload
     - service: 
@@ -78,10 +46,4 @@
       register: result
     - debug:
         msg: "{{result.stdout}}"
-  # - name: "template files to all nodes"
-  #   template:
-  #     src: "{{item.src}}"
-  #     dest: "{{item.dest}}"
-  #   with_items:
-  #   - src: "template/calico/10-calico.conf"
-  #     dest: "/etc/cni/net.d/"
+    when: k8s.network == calico
