@@ -1,0 +1,2 @@
+KUBELET_POD_INFRA_CONTAINER="--pod-infra-container-image={{images.pause_amd64}}"
+KUBELET_ARGS="--cluster-dns={{k8s.cluster_dns}} --kubeconfig=/etc/kubernetes/kubeconfig --tls-cert-file=/etc/kubernetes/ssl/admin.pem --tls-private-key-file=/etc/kubernetes/ssl/admin-key.pem --cert-dir=/etc/kubernetes/ssl --cluster-domain=cluster.local --serialize-image-pulls=false"

@@ -32,10 +32,18 @@
     with_items:
     - src: "template/k8s/config"
       dest: "/etc/kubernetes/"
-    - src: "template/k8s/kubelet"
-      dest: "/etc/kubernetes/"
     - src: "template/k8s/proxy"
       dest: "/etc/kubernetes/"
+  - name: "template kubelet to nodes"
+    template:
+      src: "template/k8s/kubelet-calico"
+      dest: "/etc/kubernetes/kubelet"
+    when: k8s.network == "calico"
+  - name: "template kubelet to nodes"
+    template:
+      src: "template/k8s/kubelet-flannel"
+      dest: "/etc/kubernetes/kubelet"
+    when: k8s.network == "flannel"
   - block:
     - shell: "swapoff -a"
     - shell: "kubectl config set-cluster kubernetes --certificate-authority=/etc/kubernetes/ssl/ca.pem --embed-certs=true --server=https://{{k8s.apiserver}}:6443 --kubeconfig=/etc/kubernetes/kubeconfig"
