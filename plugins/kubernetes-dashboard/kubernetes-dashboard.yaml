@@ -63,7 +63,7 @@ spec:
       serviceAccountName: dashboard
       containers:
       - name: kubernetes-dashboard
-        image: {{docker_hub.ip}}/library/kubernetes-dashboard-amd64:v1.8.0
+        image: {{images.kubernetes_dashboard_amd64}}
         resources:
           limits:
             cpu: 100m

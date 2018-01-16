@@ -38,7 +38,7 @@ spec:
       restartPolicy: Always
       serviceAccountName: ingress
       containers:
-      - image: {{docker_hub.ip}}/library/traefik
+      - image: {{images.traefik}}
         name: traefik-ingress-lb
         ports:
         - name: http

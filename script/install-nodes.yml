@@ -23,6 +23,8 @@
       dest: "/lib/systemd/system/"
     - src: "template/k8s/kube-proxy.service"
       dest: "/lib/systemd/system/"
+    - src: "template/calico/check-calico.sh"
+      dest: "/opt/"
   - name: "template files to nodes"
     template:
       src: "{{item.src}}"
@@ -40,6 +42,13 @@
     - shell: "kubectl config set-credentials admin --client-certificate=/etc/kubernetes/ssl/admin.pem --client-key=/etc/kubernetes/ssl/admin-key.pem --embed-certs=true --kubeconfig=/etc/kubernetes/kubeconfig"
     - shell: "kubectl config set-context kubernetes --cluster=kubernetes --user=admin --kubeconfig=/etc/kubernetes/kubeconfig"
     - shell: "kubectl config use-context kubernetes --kubeconfig=/etc/kubernetes/kubeconfig"
+  - name: "check-calico"
+    shell: "/opt/check-calico.sh"
+    when: k8s.network == "calico"
+  - name: "wait for calico-node ready"
+    wait_for:
+      path: /var/run/calico-node.pid
+    when: k8s.network == "calico"
   - block:
     - shell: systemctl daemon-reload
     - service: 

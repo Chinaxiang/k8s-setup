@@ -8,16 +8,20 @@
     file:
       path: "/opt/k8s/calico"
       state: directory
+    when: k8s.network == "calico"
   - name: "copy files to k8s-cli"
     template:
       src: "{{item}}"
       dest: "/opt/k8s/calico/"
+    when: k8s.network == "calico"
     with_items:
     - "calico.yaml"
     - "rbac.yaml"
   - name: "create calico"
     shell: "cd /opt/k8s/calico/ && kubectl --kubeconfig /etc/kubernetes/kubeconfig create -f ."
+    when: k8s.network == "calico"
     register: result
   - name: "create result"
     debug:
       msg: "{{result.stdout}}"
+    when: k8s.network == "calico"

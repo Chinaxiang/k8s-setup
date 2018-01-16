@@ -9,15 +9,18 @@ k8s:
   apiservercount: 1
   iface: "enp0s5"
   insecure_registries: '["192.168.0.105:5000", "10.255.1.101"]'
+  # calico or flannel
   network: calico
-  cluster_ip_range: 10.1.0.0/16
-  cluster_dns: 10.1.0.2
-  cluster_svc: 10.1.0.1
-  cluster_cidr: 172.20.0.0/16
+  # coredns or kube-dns
+  dns: coredns
+  cluster_ip_range: 10.11.0.0/16
+  cluster_dns: 10.11.0.2
+  cluster_svc: 10.11.0.1
+  cluster_cidr: 172.17.0.0/16
 # 私有仓库信息
 docker_hub:
-  # ip: 10.255.1.101
-  ip: 192.168.0.105:5000
+  ip: 10.255.1.101
+  # ip: 192.168.0.105:5000
 # etcd集群配置信息
 etcd:
   cluster: "etcd1=https://10.211.55.11:2380,etcd2=https://10.211.55.12:2380,etcd3=https://10.211.55.14:2380"
@@ -30,3 +33,21 @@ tls:
   dest:
   - 10.211.55.11
   - 10.211.55.14
+# 使用到的镜像
+images:
+  pause_amd64: "10.255.1.101/library/pause-amd64:3.0"
+  calico_node: "10.255.1.101/library/calico-node:v2.6.5"
+  calico_kube_controllers: "10.255.1.101/library/calico-kube-controllers:v2.0.0"
+  coredns: "10.255.1.101/library/coredns:1.0.2"
+  heapster_amd64: "10.255.1.101/library/heapster-amd64:v1.4.3"
+  k8s_dns_kube_dns_amd64: "10.255.1.101/library/k8s-dns-kube-dns-amd64:1.14.7"
+  k8s_dns_dnsmasq_nanny_amd64: "10.255.1.101/library/k8s-dns-dnsmasq-nanny-amd64:1.14.7"
+  k8s_dns_sidecar_amd64: "10.255.1.101/library/k8s-dns-sidecar-amd64:1.14.7"
+  kubernetes_dashboard_amd64: "10.255.1.101/library/kubernetes-dashboard-amd64:v1.8.0"
+  traefik: "10.255.1.101/library/traefik"
+
+
+
+
+
+

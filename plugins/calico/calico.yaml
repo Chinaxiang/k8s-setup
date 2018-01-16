@@ -26,7 +26,7 @@ spec:
       serviceAccountName: calico-kube-controllers
       containers:
         - name: calico-kube-controllers
-          image: {{docker_hub.ip}}/calico/kube-controllers:v2.0.0
+          image: {{images.calico_kube_controllers}}
           env:
             - name: ETCD_ENDPOINTS
               value: {{etcd.servers}}

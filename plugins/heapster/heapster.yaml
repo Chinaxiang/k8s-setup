@@ -53,7 +53,7 @@ spec:
       serviceAccountName: heapster
       containers:
       - name: heapster
-        image: {{docker_hub.ip}}/library/heapster-amd64:v1.4.3
+        image: {{images.heapster_amd64}}
         imagePullPolicy: IfNotPresent
         command:
         - /heapster

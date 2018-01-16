@@ -8,17 +8,22 @@
     file:
       path: "/opt/k8s/kube-dns"
       state: directory
+    when: k8s.dns == "kube-dns"
   - name: "copy files to k8s-cli"
     template:
       src: "kube-dns.yaml"
       dest: "/opt/k8s/kube-dns/"
+    when: k8s.dns == "kube-dns"
   - name: "remove kube-dns"
     shell: "cd /opt/k8s/kube-dns/ && kubectl --kubeconfig /etc/kubernetes/kubeconfig delete -f ."
     register: result
-    ignore_errors: true 
+    ignore_errors: true
+    when: k8s.dns == "kube-dns" 
   - name: "delete result"
     debug:
       msg: "{{result.stdout}}"
     ignore_errors: true 
+    when: k8s.dns == "kube-dns"
   - name: "delete files"
     shell: "rm -rf /opt/k8s/kube-dns"
+    when: k8s.dns == "kube-dns"

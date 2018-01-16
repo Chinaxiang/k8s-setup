@@ -28,5 +28,3 @@
   - shell: rm -rf /usr/bin/kubectl
   - shell: rm -rf /lib/systemd/system/kube-proxy.service
   - shell: rm -rf /lib/systemd/system/kubelet.service
-  - shell: dpkg -l | grep ^rc | cut -d' ' -f3 | xargs dpkg --purge
-    ignore_errors: true 

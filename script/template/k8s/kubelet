@@ -1,3 +1,3 @@
-KUBELET_POD_INFRA_CONTAINER="--pod-infra-container-image={{docker_hub.ip}}/pause-amd64:3.0"
+KUBELET_POD_INFRA_CONTAINER="--pod-infra-container-image={{images.pause_amd64}}"
 KUBELET_ARGS="--cluster-dns={{k8s.cluster_dns}} --kubeconfig=/etc/kubernetes/kubeconfig --tls-cert-file=/etc/kubernetes/ssl/admin.pem --tls-private-key-file=/etc/kubernetes/ssl/admin-key.pem --cert-dir=/etc/kubernetes/ssl --cluster-domain=cluster.local --serialize-image-pulls=false"
 KUBELET_NET="--network-plugin=cni --cni-conf-dir=/etc/cni/net.d --cni-bin-dir=/usr/bin --hairpin-mode=hairpin-veth"
