@@ -20,6 +20,14 @@
       name: kubelet
       enabled: no
     ignore_errors: true 
+  - name: "copy clear script to all nodes"
+    copy:
+      src: "template/k8s/clear-pods.sh"
+      dest: "/opt/"
+      mode: 0755
+  - shell: /opt/clear-pods.sh
+    ignore_errors: true 
+  - shell: rm -rf /opt/clear-pods.sh
   - shell: rm -rf /var/log/kubernetes
   - shell: rm -rf /var/lib/kubelet
   - shell: rm -rf /etc/kubernetes

@@ -18,6 +18,14 @@
     ignore_errors: true 
   - shell: dpkg -r conntrack
     ignore_errors: true 
+  - name: "copy clear script to all nodes"
+    copy:
+      src: "template/docker/clear-docker.sh"
+      dest: "/opt/"
+      mode: 0755
+  - shell: /opt/clear-docker.sh
+    ignore_errors: true 
+  - shell: rm -rf /opt/clear-docker.sh
   - shell: rm -rf /var/log/containers
   - shell: rm -rf /opt/docker-ce_17.03.2-ce-0-ubuntu-xenial_amd64.deb
   - shell: rm -rf /opt/libltdl7_2.4.6-0.1_amd64.deb

@@ -17,6 +17,7 @@
   - block:  
     - shell: rm -rf /etc/sysconfig/flanneld
     - shell: rm -rf /run/flannel
+    - shell: rm -rf /var/run/flannel
     - shell: rm -rf /lib/systemd/system/flanneld.service
     - shell: rm -rf /usr/bin/flanneld
     - shell: rm -rf /usr/bin/mk-docker-opts.sh
