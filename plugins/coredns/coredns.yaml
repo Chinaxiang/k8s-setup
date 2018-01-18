@@ -55,14 +55,12 @@ data:
   Corefile: |
     .:53 {
         errors
-        log
         health
         kubernetes cluster.local {{k8s.cluster_ip_range}} {
             pods insecure
         }
-        prometheus
         proxy . /etc/resolv.conf
-        cache 1000
+        cache 60
     }
 ---
 apiVersion: extensions/v1beta1
