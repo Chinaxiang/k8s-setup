@@ -1,1 +1,1 @@
-KUBE_PROXY_ARGS="--kubeconfig=/etc/kubernetes/kubeconfig"
+KUBE_PROXY_ARGS="--hostname-override={{hostname}} --kubeconfig=/etc/kubernetes/kubeconfig"

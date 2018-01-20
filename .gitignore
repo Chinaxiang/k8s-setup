@@ -1,6 +1,7 @@
 # gitignore
 .DS_Store
 *.tar
+*.tar.gz
 *.deb
 *.zip
 *.retry
