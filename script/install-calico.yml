@@ -16,34 +16,19 @@
       mode: 0755
     when: k8s.network == "calico"
     with_items:
-    - src: "../sbin/calico"
-      dest: "/usr/bin/"
-    - src: "../sbin/calico-ipam"
-      dest: "/usr/bin/"
+    - src: "../sbin/bridge"
+      dest: "/usr/local/bin/"
+    - src: "../sbin/host-local"
+      dest: "/usr/local/bin/"
     - src: "../sbin/loopback"
-      dest: "/usr/bin/"
+      dest: "/usr/local/bin/"
     - src: "../sbin/calicoctl"
-      dest: "/usr/bin/"
+      dest: "/usr/local/bin/"
   - name: "template files to all nodes"
     template:
       src: "{{item.src}}"
       dest: "{{item.dest}}"
     when: k8s.network == "calico"
     with_items:
-    - src: "template/calico/10-calico.conf"
+    - src: "template/calico/10-default.conf"
       dest: "/etc/cni/net.d/"
-    - src: "template/calico/calico-node.service"
-      dest: "/lib/systemd/system/"
-  - block:
-    - shell: systemctl daemon-reload
-    - service: 
-        name: calico-node
-        enabled: yes
-    - service: 
-        name: calico-node
-        state: restarted
-    - shell: systemctl status calico-node
-      register: result
-    - debug:
-        msg: "{{result.stdout}}"
-    when: k8s.network == "calico"

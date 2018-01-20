@@ -25,3 +25,5 @@
     debug:
       msg: "{{result.stdout}}"
     when: k8s.network == "calico"
+  - shell: rm -rf /etc/cni/net.d/10-default.conf
+    when: k8s.network == "calico"

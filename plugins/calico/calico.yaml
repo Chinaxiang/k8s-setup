@@ -1,3 +1,186 @@
+# Calico Version v2.6.5
+# https://docs.projectcalico.org/v2.6/releases#v2.6.5
+# This manifest includes the following component versions:
+#   calico/node:v2.6.5
+#   calico/cni:v1.11.2
+#   calico/kube-controllers:v1.0.2
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: calico-config
+  namespace: kube-system
+data:
+  etcd_endpoints: "{{etcd.servers}}"
+  calico_backend: "bird"
+  cni_network_config: |-
+    {
+        "name": "k8s-pod-network",
+        "cniVersion": "0.1.0",
+        "type": "calico",
+        "etcd_endpoints": "{{etcd.servers}}",
+        "etcd_key_file": "/etc/kubernetes/ssl/kubernetes-key.pem",
+        "etcd_cert_file": "/etc/kubernetes/ssl/kubernetes.pem",
+        "etcd_ca_cert_file": "/etc/kubernetes/ssl/ca.pem",
+        "log_level": "info",
+        "mtu": 1500,
+        "ipam": {
+            "type": "calico-ipam"
+        },
+        "policy": {
+            "type": "k8s"
+        },
+        "kubernetes": {
+            "kubeconfig": "/etc/kubernetes/kubeconfig"
+        }
+    }
+
+  etcd_ca: "/calico-secrets/ca.pem"
+  etcd_cert: "/calico-secrets/kubernetes.pem"
+  etcd_key: "/calico-secrets/kubernetes-key.pem"
+---
+kind: DaemonSet
+apiVersion: extensions/v1beta1
+metadata:
+  name: calico-node
+  namespace: kube-system
+  labels:
+    k8s-app: calico-node
+spec:
+  selector:
+    matchLabels:
+      k8s-app: calico-node
+  template:
+    metadata:
+      labels:
+        k8s-app: calico-node
+      annotations:
+        scheduler.alpha.kubernetes.io/critical-pod: ''
+        scheduler.alpha.kubernetes.io/tolerations: |
+          [{"key": "dedicated", "value": "master", "effect": "NoSchedule" },
+           {"key":"CriticalAddonsOnly", "operator":"Exists"}]
+    spec:
+      hostNetwork: true
+      serviceAccountName: calico-node
+      terminationGracePeriodSeconds: 0
+      containers:
+        - name: calico-node
+          image: {{images.calico_node}}
+          env:
+            - name: ETCD_ENDPOINTS
+              valueFrom:
+                configMapKeyRef:
+                  name: calico-config
+                  key: etcd_endpoints
+            - name: CALICO_NETWORKING_BACKEND
+              valueFrom:
+                configMapKeyRef:
+                  name: calico-config
+                  key: calico_backend
+            - name: CLUSTER_TYPE
+              value: "k8s,bgp"
+            - name: CALICO_DISABLE_FILE_LOGGING
+              value: "true"
+            - name: FELIX_DEFAULTENDPOINTTOHOSTACTION
+              value: "ACCEPT"
+            - name: CALICO_IPV4POOL_CIDR
+              value: "{{k8s.cluster_cidr}}"
+            - name: CALICO_IPV4POOL_IPIP
+              value: "off"
+            - name: CALICO_K8S_NODE_REF
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: FELIX_IPV6SUPPORT
+              value: "false"
+            - name: FELIX_LOGSEVERITYSCREEN
+              value: "info"
+            - name: FELIX_IPINIPMTU
+              value: "1440"
+            - name: ETCD_CA_CERT_FILE
+              valueFrom:
+                configMapKeyRef:
+                  name: calico-config
+                  key: etcd_ca
+            - name: ETCD_KEY_FILE
+              valueFrom:
+                configMapKeyRef:
+                  name: calico-config
+                  key: etcd_key
+            - name: ETCD_CERT_FILE
+              valueFrom:
+                configMapKeyRef:
+                  name: calico-config
+                  key: etcd_cert
+            - name: IP
+              value: ""
+            # - name: IP_AUTODETECTION_METHOD
+            #   value: ""
+            - name: FELIX_HEALTHENABLED
+              value: "true"
+          securityContext:
+            privileged: true
+          # resources:
+          #   requests:
+          #     cpu: 250m
+          livenessProbe:
+            httpGet:
+              path: /liveness
+              port: 9099
+            periodSeconds: 10
+            initialDelaySeconds: 10
+            failureThreshold: 6
+          readinessProbe:
+            httpGet:
+              path: /readiness
+              port: 9099
+            periodSeconds: 10
+          volumeMounts:
+            - mountPath: /lib/modules
+              name: lib-modules
+              readOnly: true
+            - mountPath: /var/run/calico
+              name: var-run-calico
+              readOnly: false
+            - mountPath: /calico-secrets
+              name: etcd-certs
+        - name: install-cni
+          image: {{images.calico_cni}}
+          command: ["/install-cni.sh"]
+          env:
+            - name: ETCD_ENDPOINTS
+              valueFrom:
+                configMapKeyRef:
+                  name: calico-config
+                  key: etcd_endpoints
+            - name: CNI_NETWORK_CONFIG
+              valueFrom:
+                configMapKeyRef:
+                  name: calico-config
+                  key: cni_network_config
+          volumeMounts:
+            - mountPath: /host/opt/cni/bin
+              name: cni-bin-dir
+            - mountPath: /host/etc/cni/net.d
+              name: cni-net-dir
+            - mountPath: /calico-secrets
+              name: etcd-certs
+      volumes:
+        - name: lib-modules
+          hostPath:
+            path: /lib/modules
+        - name: var-run-calico
+          hostPath:
+            path: /var/run/calico
+        - name: cni-bin-dir
+          hostPath:
+            path: /usr/local/bin
+        - name: cni-net-dir
+          hostPath:
+            path: /etc/cni/net.d
+        - name: etcd-certs
+          hostPath:
+            path: /etc/kubernetes/ssl
+
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -15,6 +198,9 @@ spec:
   replicas: 1
   strategy:
     type: Recreate
+  selector:
+    matchLabels:
+      k8s-app: calico-kube-controllers
   template:
     metadata:
       name: calico-kube-controllers
@@ -52,4 +238,12 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: calico-kube-controllers
+  namespace: kube-system
+
+---
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: calico-node
   namespace: kube-system

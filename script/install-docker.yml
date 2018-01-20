@@ -9,16 +9,16 @@
       dest: "{{item.dest}}"
       mode: 0755
     with_items:
-    - src: "../sbin/docker-ce_17.03.2-ce-0-ubuntu-xenial_amd64.deb"
+    - src: "../sbin/docker-ce.deb"
       dest: "/opt/"
-    - src: "../sbin/libltdl7_2.4.6-0.1_amd64.deb"
+    - src: "../sbin/libltdl7.deb"
       dest: "/opt/"
-    - src: "../sbin/conntrack_1.4.3-3_amd64.deb"
+    - src: "../sbin/conntrack.deb"
       dest: "/opt/"
   - block:
-    - shell: dpkg -i /opt/libltdl7_2.4.6-0.1_amd64.deb
-    - shell: dpkg -i /opt/conntrack_1.4.3-3_amd64.deb
-    - shell: dpkg -i /opt/docker-ce_17.03.2-ce-0-ubuntu-xenial_amd64.deb
+    - shell: dpkg -i /opt/libltdl7.deb
+    - shell: dpkg -i /opt/conntrack.deb
+    - shell: dpkg -i /opt/docker-ce.deb
     ignore_errors: true 
   - name: "copy daemon.json to /etc/docker/"
     template:

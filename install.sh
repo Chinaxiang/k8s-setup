@@ -130,6 +130,7 @@ ansible-playbook -i config/hosts script/install-masters.yml
 h2 "[Step $item]: install nodes ..."; let item+=1
 ansible-playbook -i config/hosts script/install-nodes.yml
 
+
 note "Begin install plugins."
 h2 "[Step $item]: install calico controller ..."; let item+=1
 ansible-playbook -i config/hosts plugins/calico/install-calico.yml
