@@ -1,6 +1,6 @@
 # 卸载flanneld
 ---
-- hosts: "k8s-all"
+- hosts: "k8s-nodes"
   vars_files:
   - "../config/config.yml"
   tasks:

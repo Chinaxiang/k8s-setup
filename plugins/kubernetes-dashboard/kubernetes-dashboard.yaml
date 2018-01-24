@@ -71,6 +71,8 @@ spec:
           requests:
             cpu: 100m
             memory: 50Mi
+        args:
+        - --heapster-host=http://heapster
         ports:
         - containerPort: 9090
         livenessProbe:
