@@ -1,4 +1,3 @@
-# 卸载kube-dns服务
 ---
 - hosts: "k8s-cli"
   vars_files:

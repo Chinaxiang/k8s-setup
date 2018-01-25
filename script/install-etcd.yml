@@ -1,4 +1,3 @@
-# 安装etcd集群
 ---
 - hosts: "etcd"
   vars_files:

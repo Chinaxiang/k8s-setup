@@ -1,4 +1,3 @@
-# 卸载masters
 ---
 - hosts: "k8s-masters"
   vars_files:

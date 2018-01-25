@@ -1,4 +1,3 @@
-# 配置calico虚拟网络
 ---
 - hosts: "k8s-nodes"
   vars_files:

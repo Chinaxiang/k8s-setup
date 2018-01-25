@@ -1,4 +1,3 @@
-# 生成集群需要的证书并拷贝到目标机器
 ---
 - hosts: "k8s-cli"
   vars_files:

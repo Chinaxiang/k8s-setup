@@ -1,4 +1,3 @@
-# 配置flannel虚拟网络
 ---
 - hosts: "k8s-nodes"
   vars_files:

@@ -1,4 +1,3 @@
-# 卸载docker
 ---
 - hosts: "k8s-nodes"
   vars_files:
