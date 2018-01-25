@@ -1,6 +1,5 @@
-# 卸载flanneld
 ---
-- hosts: "k8s-all"
+- hosts: "k8s-nodes"
   vars_files:
   - "../config/config.yml"
   tasks:
@@ -21,4 +20,6 @@
     - shell: rm -rf /lib/systemd/system/flanneld.service
     - shell: rm -rf /usr/bin/flanneld
     - shell: rm -rf /usr/bin/mk-docker-opts.sh
+    - shell: ip link del flannel.1
+      ignore_errors: true
     when: k8s.network == "flannel"

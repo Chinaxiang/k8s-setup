@@ -1,6 +1,10 @@
 # sbin
 
-这里放置安装需要的二进制文件，按如下结构组织文件。
+这里放置安装需要的二进制文件，请移步百度网盘下载`k8s-1.8.tar.gz`二进制文件压缩包解压放置到此目录下：
+
+https://pan.baidu.com/s/1hsZViQw
+
+按如下结构组织文件:
 
 - calico
 - calico-ipam
@@ -27,6 +31,7 @@
 版本：
 
 - cni插件: 0.1.0
+- calico插件：2.x
 - cfssl: 1.2
 - etcd: 3.2.9
 - flannel: 0.9.0

@@ -3,12 +3,6 @@
   vars_files:
   - "../config/config.yml"
   tasks:
-  # - name: "config hostname"
-  #   shell: "hostnamectl set-hostname {{hostname}}"
-  # - name: "config hosts"
-  #   copy: 
-  #     src: "template/hosts"
-  #     dest: "/etc/hosts"
   - name: "apt clean"
     shell: "apt-get -y purge ufw lxd lxd-client lxcfs lxc-common && apt-get clean"
     ignore_errors: true 

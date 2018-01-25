@@ -60,7 +60,7 @@ data:
             pods insecure
         }
         proxy . /etc/resolv.conf
-        cache 60
+        cache 1000
     }
 ---
 apiVersion: extensions/v1beta1

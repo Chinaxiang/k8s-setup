@@ -1,4 +1,3 @@
-# 部署calico服务
 ---
 - hosts: "k8s-cli"
   vars_files:
