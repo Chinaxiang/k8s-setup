@@ -26,10 +26,10 @@ https://hub.docker.com/r/mirrorgooglecontainers/kubernetes-dashboard-amd64/tags/
 - k8s-plugins: kubernetes核心插件
   - calico
   - kube-dns
-	- coredns
-	- heapster
-	- kubernetes-dashboard
-	- traefik-ingress
+  - coredns
+  - heapster
+  - kubernetes-dashboard
+  - traefik-ingress
 
 ## 环境准备
 
