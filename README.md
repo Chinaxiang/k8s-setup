@@ -17,19 +17,19 @@ https://hub.docker.com/r/mirrorgooglecontainers/kubernetes-dashboard-amd64/tags/
 - calico: （可选）虚拟网络服务，支撑容器网络，版本:2.0
 - docker: 容器服务，版本:docker-ce 17.03
 - k8s: kubernetes核心组件，版本：1.18.3
-	- kube-apiserver
-	- kube-controller-manager
-	- kube-scheduler
-	- kubelet
-	- kubectl
-	- kube-proxy
+  - kube-apiserver
+  - kube-controller-manager
+  - kube-scheduler
+  - kubelet
+  - kubectl
+  - kube-proxy
 - k8s-plugins: kubernetes核心插件
   - calico
-	- coredns
+  - coredns
   - kube-dns
-	- heapster
-	- kubernetes-dashboard
-	- traefik-ingress
+  - heapster
+  - kubernetes-dashboard
+  - traefik-ingress
 
 ## 环境准备
 
