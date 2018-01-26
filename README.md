@@ -6,6 +6,10 @@ https://pan.baidu.com/s/1hsZViQw
 
 请按分支选择，将压缩包解压到`sbin`目录下。
 
+需要使用到的谷歌镜像可以到使用这位好心人提供的谷歌镜像：
+
+https://hub.docker.com/r/mirrorgooglecontainers/kubernetes-dashboard-amd64/tags/
+
 将会部署如下组件：
 
 - etcd: 分布式存储服务，供k8s存储配置，版本:3.2.9
