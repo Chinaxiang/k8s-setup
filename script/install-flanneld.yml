@@ -1,3 +1,4 @@
+# 配置flannel虚拟网络
 ---
 - hosts: "k8s-nodes"
   vars_files:
@@ -20,7 +21,7 @@
     - src: "../sbin/mk-docker-opts.sh"
       dest: "/usr/bin/"
     - src: "template/flannel/flanneld.service"
-      dest: "/lib/systemd/system/"
+      dest: "/etc/init/flanneld.conf"
   - name: "template files to all nodes"
     template:
       src: "{{item.src}}"
@@ -30,14 +31,11 @@
     - src: "template/flannel/flanneld"
       dest: "/etc/sysconfig/"
   - block:
-    - shell: systemctl daemon-reload
-    - service: 
-        name: flanneld
-        enabled: yes
-    - service: 
-        name: flanneld
-        state: restarted
-    - shell: systemctl status flanneld
+    - shell: initctl stop flanneld
+      ignore_errors: true 
+    - shell: initctl start flanneld
+      ignore_errors: true
+    - shell: initctl status flanneld
       register: result
     - debug:
         msg: "{{result.stdout}}"

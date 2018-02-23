@@ -1,15 +1,19 @@
-[Unit]
-Description=Etcd Server
-After=network.target
-After=network-online.target
-Wants=network-online.target
-Documentation=https://github.com/coreos
+description "etcd daemon"
 
-[Service]
-Type=notify
-WorkingDirectory=/var/lib/etcd/
-EnvironmentFile=-/etc/etcd/etcd.conf
-ExecStart=/usr/bin/etcd \
+start on startup
+stop on shutdown
+
+respawn
+respawn limit 2 5
+console output
+
+script
+    logger "start $UPSTART_JOB"
+    ETCD=/usr/bin/etcd
+    if [ -f /etc/etcd/etcd.conf ]; then
+        . /etc/etcd/etcd.conf
+    fi
+    exec "$ETCD" \
     --name ${ETCD_NAME} \
     --data-dir ${ETCD_DATA_DIR} \
     --cert-file /etc/kubernetes/ssl/kubernetes.pem \
@@ -25,9 +29,12 @@ ExecStart=/usr/bin/etcd \
     --initial-cluster ${ETCD_INITIAL_CLUSTER} \
     --initial-cluster-token ${ETCD_INITIAL_CLUSTER_TOKEN} \
     --initial-cluster-state ${ETCD_INITIAL_CLUSTER_STATE}
-Restart=on-failure
-RestartSec=5
-LimitNOFILE=65536
+end script
 
-[Install]
-WantedBy=multi-user.target
+post-start script
+    logger "etcd is up"
+end script
+
+post-stop script
+    logger "etcd is stopped"
+end script

@@ -57,14 +57,14 @@ function check_ansible {
 		ansible_version_part1=${BASH_REMATCH[2]} # 2
 		ansible_version_part2=${BASH_REMATCH[3]} # 4
 		
-        # the version of ansible_version does not meet the requirement
-        if [ "$ansible_version_part1" -lt 2 ] || ([ "$ansible_version_part1" -eq 2 ] && [ "$ansible_version_part2" -lt 4 ])
-        then
-            error "Need to upgrade ansible_version package to 2.4.x+."
-            exit 1
-        else
-            note "ansible version: $ansible_version"
-        fi
+    # the version of ansible_version does not meet the requirement
+    if [ "$ansible_version_part1" -lt 2 ] || ([ "$ansible_version_part1" -eq 2 ] && [ "$ansible_version_part2" -lt 4 ])
+    then
+        error "Need to upgrade ansible_version package to 2.4.x+."
+        exit 1
+    else
+        note "ansible version: $ansible_version"
+    fi
 	else
 		error "Failed to parse ansible version."
 		exit 1
@@ -129,6 +129,8 @@ h2 "[Step $item]: install masters ..."; let item+=1
 ansible-playbook -i config/hosts script/install-masters.yml
 h2 "[Step $item]: install nodes ..."; let item+=1
 ansible-playbook -i config/hosts script/install-nodes.yml
+
+exit 0
 
 note "Begin install plugins."
 h2 "[Step $item]: install calico controller ..."; let item+=1

@@ -1,3 +1,4 @@
+# 部署kubernetes-dashboard服务
 ---
 - hosts: "k8s-cli"
   vars_files:

@@ -18,11 +18,11 @@
     - src: "../sbin/kubectl"
       dest: "/usr/bin/"
     - src: "template/k8s/kube-apiserver.service"
-      dest: "/lib/systemd/system/"
+      dest: "/etc/init/kube-apiserver.conf"
     - src: "template/k8s/kube-controller-manager.service"
-      dest: "/lib/systemd/system/"
+      dest: "/etc/init/kube-controller-manager.conf"
     - src: "template/k8s/kube-scheduler.service"
-      dest: "/lib/systemd/system/"
+      dest: "/etc/init/kube-scheduler.conf"
     - src: "template/k8s/basic.csv"
       dest: "/etc/kubernetes/"
     - src: "template/k8s/token.csv"
@@ -41,14 +41,11 @@
     - src: "template/k8s/scheduler"
       dest: "/etc/kubernetes/"
   - block:
-    - shell: systemctl daemon-reload
-    - service: 
-        name: kube-apiserver
-        enabled: yes
-    - service: 
-        name: kube-apiserver
-        state: restarted
-    - shell: systemctl status kube-apiserver
+    - shell: initctl stop kube-apiserver
+      ignore_errors: true 
+    - shell: initctl start kube-apiserver
+      ignore_errors: true
+    - shell: initctl status kube-apiserver
       register: result
     - debug:
         msg: "{{result.stdout}}"
@@ -58,26 +55,20 @@
     - shell: "kubectl config set-context kubernetes --cluster=kubernetes --user=admin --kubeconfig=/etc/kubernetes/kubeconfig"
     - shell: "kubectl config use-context kubernetes --kubeconfig=/etc/kubernetes/kubeconfig"
   - block:
-    - shell: systemctl daemon-reload
-    - service: 
-        name: kube-controller-manager
-        enabled: yes
-    - service: 
-        name: kube-controller-manager
-        state: restarted
-    - shell: systemctl status kube-controller-manager
+    - shell: initctl stop kube-controller-manager
+      ignore_errors: true 
+    - shell: initctl start kube-controller-manager
+      ignore_errors: true
+    - shell: initctl status kube-controller-manager
       register: result
     - debug:
         msg: "{{result.stdout}}"
   - block:
-    - shell: systemctl daemon-reload
-    - service: 
-        name: kube-scheduler
-        enabled: yes
-    - service: 
-        name: kube-scheduler
-        state: restarted
-    - shell: systemctl status kube-scheduler
+    - shell: initctl stop kube-scheduler
+      ignore_errors: true 
+    - shell: initctl start kube-scheduler
+      ignore_errors: true
+    - shell: initctl status kube-scheduler
       register: result
     - debug:
         msg: "{{result.stdout}}"

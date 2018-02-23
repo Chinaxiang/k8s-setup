@@ -1,50 +1,43 @@
 ---
 # ansible配置
 # 待管理主机的python命令
-ansible_python_interpreter: "/usr/bin/python3"
+ansible_python_interpreter: "/usr/bin/python"
 
 # k8s集群信息
 k8s:
-  apiserver: "10.211.55.12"
+  apiserver: "10.211.55.15"
   apiservercount: 1
-  iface: "enp0s5"
-  insecure_registries: '["192.168.0.105:5000", "10.255.1.101"]'
+  iface: "eth0"
+  insecure_registries: '["10.255.1.101"]'
   # calico or flannel
   network: calico
   # coredns or kube-dns
   dns: coredns
-  cluster_ip_range: 10.1.0.0/16
-  cluster_dns: 10.1.0.2
-  cluster_svc: 10.1.0.1
-  cluster_cidr: 172.1.0.0/16
+  cluster_ip_range: 10.10.0.0/16
+  cluster_dns: 10.10.0.2
+  cluster_svc: 10.10.0.1
+  cluster_cidr: 172.10.0.0/16
 # etcd集群配置信息
 etcd:
-  cluster: "etcd1=https://10.211.55.11:2380,etcd2=https://10.211.55.12:2380,etcd3=https://10.211.55.14:2380"
-  servers: "https://10.211.55.11:2379,https://10.211.55.12:2379,https://10.211.55.14:2379"
+  cluster: "etcd1=https://10.211.55.15:2380"
+  servers: "https://10.211.55.15:2379"
 # TLS证书配置
 tls:
   # 证书hosts字段值，应该包含etcd,master节点,apiserver负载节点的所有IP
-  ips: '"10.211.55.11","10.211.55.12","10.211.55.14"'
+  ips: '"10.211.55.15"'
   # 证书拷贝目标机器列表
   dest:
-  - 10.211.55.11
-  - 10.211.55.14
-# 使用到的镜像，请自行准备可用的镜像
+  - 10.211.55.15
+# 使用到的镜像
 images:
-  pause_amd64: "chinaxiang/pause-amd64:3.0"
-  calico_node: "calico/node:v2.6.5"
-  calico_cni: "calico/cni:v1.11.2"
-  calico_kube_controllers: "calico/kube-controllers:v1.0.2"
-  coredns: "coredns/coredns:1.0.3"
-  heapster_amd64: "chinaxiang/heapster-amd64:v1.5.0"
-  k8s_dns_kube_dns_amd64: "chinaxiang/k8s-dns-kube-dns-amd64:1.14.7"
-  k8s_dns_dnsmasq_nanny_amd64: "chinaxiang/k8s-dns-dnsmasq-nanny-amd64:1.14.7"
-  k8s_dns_sidecar_amd64: "chinaxiang/k8s-dns-sidecar-amd64:1.14.7"
-  kubernetes_dashboard_amd64: "chinaxiang/kubernetes-dashboard-amd64:v1.8.0"
-  traefik: "traefik"
-
-
-
-
-
-
+  pause_amd64: "10.255.1.101/library/pause-amd64:3.0"
+  calico_node: "10.255.1.101/library/calico-node:v2.6.5"
+  calico_cni: "10.255.1.101/library/calico-cni:v1.11.2"
+  calico_kube_controllers: "10.255.1.101/library/calico-kube-controllers:v1.0.2"
+  coredns: "10.255.1.101/library/coredns:1.0.3"
+  heapster_amd64: "10.255.1.101/library/heapster-amd64:v1.5.0"
+  k8s_dns_kube_dns_amd64: "10.255.1.101/library/k8s-dns-kube-dns-amd64:1.14.7"
+  k8s_dns_dnsmasq_nanny_amd64: "10.255.1.101/library/k8s-dns-dnsmasq-nanny-amd64:1.14.7"
+  k8s_dns_sidecar_amd64: "10.255.1.101/library/k8s-dns-sidecar-amd64:1.14.7"
+  kubernetes_dashboard_amd64: "10.255.1.101/library/kubernetes-dashboard-amd64:v1.8.0"
+  traefik: "10.255.1.101/library/traefik"

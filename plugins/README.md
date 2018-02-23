@@ -18,7 +18,7 @@ kubernetes 监控指标搜集器。
 
 ## kube-dns
 
-与coredns类似，比coredns早，需要多个镜像，稍繁琐。
+与coredns类似，比kube-dns早，需要多个镜像，稍繁琐。
 
 ## kubernetes-dashboard
 

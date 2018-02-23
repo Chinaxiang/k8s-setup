@@ -1,3 +1,4 @@
+# 卸载etcd
 ---
 - hosts: "etcd"
   vars_files:
@@ -13,5 +14,5 @@
     ignore_errors: true 
   - shell: rm -rf /etc/etcd
   - shell: rm -rf /var/lib/etcd
-  - shell: rm -rf /lib/systemd/system/etcd.service
+  - shell: rm -rf /etc/init/etcd.conf
   - shell: rm -rf /usr/bin/etcd*

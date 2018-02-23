@@ -1,10 +1,29 @@
 # sbin
 
-这里放置安装需要的二进制文件，请移步百度网盘下载`k8s-1.9.tar.gz`二进制文件压缩包解压放置到此目录下：
+这里放置安装需要的二进制文件.
 
-https://pan.baidu.com/s/1hsZViQw
+组件版本：
 
-按如下结构组织文件:
+- etcd: 3.2.13
+- flannel: 0.9.1
+- cni: 0.1.0
+  - calico/node: v2.6.5
+  - calico/cni: v1.11.2
+  - calico/kube-controllers: v1.0.2
+- docker: 17.12.0-ce
+- k8s 1.9.2
+  - kube-apiserver
+  - kube-controller-manager
+  - kube-scheduler
+  - kubelet
+  - kube-proxy
+- coredns: 1.0.3
+- kube-dns: 1.14.7
+- heapster: 1.5.0
+- kubernetes-dashboard: 1.8.0
+- traefik: latest, 1.5.2
+
+目录组成：
 
 - bridge
 - calicoctl
@@ -13,7 +32,6 @@ https://pan.baidu.com/s/1hsZViQw
 - cfssljson
 - conntrack.deb
 - docker-ce.deb
-- docker-compose
 - etcd
 - etcdctl
 - flanneld
@@ -25,18 +43,12 @@ https://pan.baidu.com/s/1hsZViQw
 - kubectl
 - kubelet
 - libltdl7.deb
+- libmnl0.deb
+- libnetfilter-conntrack3.deb
+- libsystemd-journal0.deb
 - loopback
 - mk-docker-opts.sh
-
-版本：
-
-- cfssl: 1.2
-- docker-ce: 17.12.0
-- docker-compose: 1.18
-- etcd: 3.2.13
-- kubernetes: 1.9.2
-- flannel: 0.9.1
-
+- nsenter
 
 
 

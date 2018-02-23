@@ -1,14 +1,22 @@
-[Unit]
-Description=Kubernetes Kubelet Server
-Documentation=https://github.com/kubernetes
-After=docker.service
-Requires=docker.service
+description "kubelet daemon"
 
-[Service]
-WorkingDirectory=/var/lib/kubelet
-EnvironmentFile=-/etc/kubernetes/config
-EnvironmentFile=-/etc/kubernetes/kubelet
-ExecStart=/usr/bin/kubelet \
+start on startup
+stop on shutdown
+
+respawn
+respawn limit 2 5
+console output
+
+script
+    logger "start $UPSTART_JOB"
+
+    if [ -f /etc/kubernetes/config ]; then
+      . /etc/kubernetes/config
+    fi
+    if [ -f /etc/kubernetes/kubelet ]; then
+      . /etc/kubernetes/kubelet
+    fi
+    exec /usr/bin/kubelet \
     $KUBE_LOG_DIR \
     $KUBE_LOGTOSTDERR \
     $KUBE_LOG_LEVEL \
@@ -16,9 +24,12 @@ ExecStart=/usr/bin/kubelet \
     $KUBELET_POD_INFRA_CONTAINER \
     $KUBELET_ARGS \
     $KUBELET_NET
-Restart=on-failure
-RestartSec=5
-LimitNOFILE=65536
+end script
 
-[Install]
-WantedBy=multi-user.target
+post-start script
+    logger "kubelet is up"
+end script
+
+post-stop script
+    logger "kubelet is stopped"
+end script

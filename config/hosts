@@ -1,25 +1,20 @@
 # 主机目录配置
 [etcd]
-10.211.55.11 etcd_name=etcd1
-10.211.55.12 etcd_name=etcd2
-10.211.55.14 etcd_name=etcd3
+10.211.55.15 etcd_name=etcd1
 
 [k8s-masters]
-10.211.55.12
+10.211.55.15
 
 [k8s-nodes]
-10.211.55.11
-10.211.55.14
+10.211.55.15
 
 [k8s-cli]
-10.211.55.12
+10.211.55.15
 
 [k8s-all]
-10.211.55.11 hostname=k8s-11 node_ip=10.211.55.11
-10.211.55.12 hostname=k8s-12 node_ip=10.211.55.12
-10.211.55.14 hostname=k8s-14 node_ip=10.211.55.14
+10.211.55.15 hostname=k8s-15 node_ip=10.211.55.15
 
 [all:vars]
-ansible_user=panda
+ansible_user=ubuntu
 ansible_become=true
-ansible_become_pass=panda
+ansible_become_pass=ubuntu

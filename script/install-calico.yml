@@ -1,3 +1,4 @@
+# 配置calico虚拟网络
 ---
 - hosts: "k8s-nodes"
   vars_files:
@@ -22,6 +23,8 @@
     - src: "../sbin/loopback"
       dest: "/usr/local/bin/"
     - src: "../sbin/calicoctl"
+      dest: "/usr/local/bin/"
+    - src: "../sbin/nsenter"
       dest: "/usr/local/bin/"
   - name: "template files to all nodes"
     template:

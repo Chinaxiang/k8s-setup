@@ -1,3 +1,4 @@
+# 卸载docker
 ---
 - hosts: "k8s-nodes"
   vars_files:
@@ -31,7 +32,7 @@
   - shell: rm -rf /opt/conntrack.deb
   - shell: rm -rf /etc/docker && rm -rf /var/lib/docker
   - shell: rm -rf /run/docker*
-  - shell: rm -rf /lib/systemd/system/docker*
+  - shell: rm -rf /etc/init/docker*
   - shell: ip link del docker0
     ignore_errors: true 
   - shell: dpkg -l | grep ^rc | cut -d' ' -f3 | xargs dpkg --purge

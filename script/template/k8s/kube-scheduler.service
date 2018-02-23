@@ -1,21 +1,33 @@
-[Unit]
-Description=Kubernetes Scheduler
-Documentation=https://github.com/kubernetes
-After=kube-apiserver.service
-Requires=kube-apiserver.service
+description "kube-scheduler daemon"
 
-[Service]
-EnvironmentFile=-/etc/kubernetes/config
-EnvironmentFile=-/etc/kubernetes/scheduler
-ExecStart=/usr/bin/kube-scheduler \
+start on startup
+stop on shutdown
+
+respawn
+respawn limit 2 5
+console output
+
+script
+    logger "start $UPSTART_JOB"
+
+    if [ -f /etc/kubernetes/config ]; then
+      . /etc/kubernetes/config
+    fi
+    if [ -f /etc/kubernetes/scheduler ]; then
+      . /etc/kubernetes/scheduler
+    fi
+    exec /usr/bin/kube-scheduler \
     $KUBE_LOG_DIR \
     $KUBE_LOGTOSTDERR \
     $KUBE_LOG_LEVEL \
     $KUBE_CONFIG \
     $KUBE_ARGS
-Restart=on-failure
-RestartSec=5
-LimitNOFILE=65536
+end script
 
-[Install]
-WantedBy=multi-user.target
+post-start script
+    logger "kube-scheduler is up"
+end script
+
+post-stop script
+    logger "kube-scheduler is stopped"
+end script

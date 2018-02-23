@@ -1,3 +1,4 @@
+# 卸载calico
 ---
 - hosts: "k8s-nodes"
   vars_files:
@@ -16,9 +17,8 @@
   - block: 
     - shell: rm -rf /etc/cni
     - shell: rm -rf /var/run/calico*
-    - shell: rm -rf /lib/systemd/system/calico-node.service
-    - shell: rm -rf /usr/bin/calico
-    - shell: rm -rf /usr/bin/calico-ipam
-    - shell: rm -rf /usr/bin/loopback
-    - shell: rm -rf /usr/bin/calicoctl
+    - shell: rm -rf /usr/local/bin/bridge
+    - shell: rm -rf /usr/local/bin/host-local
+    - shell: rm -rf /usr/local/bin/loopback
+    - shell: rm -rf /usr/local/bin/calicoctl
     when: k8s.network == "calico"

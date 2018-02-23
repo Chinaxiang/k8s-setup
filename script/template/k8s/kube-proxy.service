@@ -1,19 +1,32 @@
-[Unit]
-Description=Kubernetes Kube-Proxy Server
-Documentation=https://github.com/kubernetes
-After=network.target
+description "kube-proxy daemon"
 
-[Service]
-EnvironmentFile=-/etc/kubernetes/config
-EnvironmentFile=-/etc/kubernetes/proxy
-ExecStart=/usr/bin/kube-proxy \
+start on startup
+stop on shutdown
+
+respawn
+respawn limit 2 5
+console output
+
+script
+    logger "start $UPSTART_JOB"
+
+    if [ -f /etc/kubernetes/config ]; then
+      . /etc/kubernetes/config
+    fi
+    if [ -f /etc/kubernetes/proxy ]; then
+      . /etc/kubernetes/proxy
+    fi
+    exec /usr/bin/kube-proxy \
     $KUBE_LOG_DIR \
     $KUBE_LOGTOSTDERR \
     $KUBE_LOG_LEVEL \
     $KUBE_PROXY_ARGS
-Restart=on-failure
-RestartSec=5
-LimitNOFILE=65536
+end script
 
-[Install]
-WantedBy=multi-user.target
+post-start script
+    logger "kube-proxy is up"
+end script
+
+post-stop script
+    logger "kube-proxy is stopped"
+end script

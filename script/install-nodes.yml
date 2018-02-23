@@ -20,9 +20,9 @@
     - src: "../sbin/kubectl"
       dest: "/usr/bin/"
     - src: "template/k8s/kubelet.service"
-      dest: "/lib/systemd/system/"
+      dest: "/etc/init/kubelet.conf"
     - src: "template/k8s/kube-proxy.service"
-      dest: "/lib/systemd/system/"
+      dest: "/etc/init/kube-proxy.conf"
   - name: "template files to nodes"
     template:
       src: "{{item.src}}"
@@ -49,26 +49,20 @@
     - shell: "kubectl config set-context kubernetes --cluster=kubernetes --user=admin --kubeconfig=/etc/kubernetes/kubeconfig"
     - shell: "kubectl config use-context kubernetes --kubeconfig=/etc/kubernetes/kubeconfig"
   - block:
-    - shell: systemctl daemon-reload
-    - service: 
-        name: kubelet
-        enabled: yes
-    - service: 
-        name: kubelet
-        state: restarted
-    - shell: systemctl status kubelet
+    - shell: initctl stop kubelet
+      ignore_errors: true 
+    - shell: initctl start kubelet
+      ignore_errors: true
+    - shell: initctl status kubelet
       register: result
     - debug:
         msg: "{{result.stdout}}"
   - block:
-    - shell: systemctl daemon-reload
-    - service: 
-        name: kube-proxy
-        enabled: yes
-    - service: 
-        name: kube-proxy
-        state: restarted
-    - shell: systemctl status kube-proxy
+    - shell: initctl stop kube-proxy
+      ignore_errors: true 
+    - shell: initctl start kube-proxy
+      ignore_errors: true
+    - shell: initctl status kube-proxy
       register: result
     - debug:
         msg: "{{result.stdout}}"

@@ -1,3 +1,4 @@
+# 安装etcd集群
 ---
 - hosts: "etcd"
   vars_files:
@@ -22,7 +23,7 @@
     - src: "../sbin/etcdctl"
       dest: "/usr/bin/"
     - src: "template/etcd/etcd.service"
-      dest: "/lib/systemd/system/"
+      dest: "/etc/init/etcd.conf"
   - name: "template files to etcd cluster"
     template:
       src: "{{item.src}}"
@@ -31,14 +32,11 @@
     - src: "template/etcd/etcd.conf"
       dest: "/etc/etcd/"
   - block:
-    - shell: systemctl daemon-reload
-    - service: 
-        name: etcd
-        enabled: yes
-    - service: 
-        name: etcd
-        state: restarted
-    - shell: systemctl status etcd
+    - shell: initctl stop etcd
+      ignore_errors: true 
+    - shell: initctl start etcd
+      ignore_errors: true
+    - shell: initctl status etcd
       register: result
     - debug:
         msg: "{{result.stdout}}"

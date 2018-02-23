@@ -1,20 +1,34 @@
-[Unit]
-Description=Flanneld Service
-After=network.target
-After=network-online.target
-Wants=network-online.target
+description "flannel daemon"
 
-[Service]
-Type=notify
-EnvironmentFile=/etc/sysconfig/flanneld
-ExecStart=/usr/bin/flanneld \
+start on startup
+stop on shutdown
+
+respawn
+respawn limit 2 5
+console output
+
+script
+    logger "start $UPSTART_JOB"
+    FLANNELD=/usr/bin/flanneld
+    if [ -f /etc/sysconfig/flanneld ]; then
+        . /etc/sysconfig/flanneld
+    fi
+    exec "$FLANNELD" \
     $ETCD_ENDPOINTS \
     $ETCD_PREFIX \
     $FLANNEL_OPTIONS
-ExecStartPost=/usr/bin/mk-docker-opts.sh -k DOCKER_NETWORK_OPTIONS -d /run/flannel/docker
-Restart=on-failure
-RestartSec=5
-LimitNOFILE=65536
+end script
 
-[Install]
-WantedBy=multi-user.target
+post-start script
+    while ! [ -e /run/flannel/subnet.env ]; do
+      initctl status $UPSTART_JOB | grep -qE "(stop|respawn)/" && exit 1
+      logger "Waiting for flanneld run"
+      sleep 0.1
+    done
+    logger "flannel is up"
+    exec /usr/bin/mk-docker-opts.sh -k DOCKER_NETWORK_OPTIONS -d /run/flannel/docker
+end script
+
+post-stop script
+    logger "flannel is stopped"
+end script

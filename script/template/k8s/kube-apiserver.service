@@ -1,13 +1,22 @@
-[Unit]
-Description=Kubernetes API Service
-Documentation=https://github.com/kubernetes
-After=network.target
+description "kube-apiserver daemon"
 
-[Service]
-Type=notify
-EnvironmentFile=-/etc/kubernetes/config
-EnvironmentFile=-/etc/kubernetes/apiserver
-ExecStart=/usr/bin/kube-apiserver \
+start on startup
+stop on shutdown
+
+respawn
+respawn limit 2 5
+console output
+
+script
+    logger "start $UPSTART_JOB"
+
+    if [ -f /etc/kubernetes/config ]; then
+      . /etc/kubernetes/config
+    fi
+    if [ -f /etc/kubernetes/apiserver ]; then
+      . /etc/kubernetes/apiserver
+    fi
+    exec /usr/bin/kube-apiserver \
     $KUBE_LOG_DIR \
     $KUBE_LOGTOSTDERR \
     $KUBE_LOG_LEVEL \
@@ -20,9 +29,12 @@ ExecStart=/usr/bin/kube-apiserver \
     $KUBE_AUTH \
     $KUBE_TLS \
     $KUBE_ARGS
-Restart=on-failure
-RestartSec=5
-LimitNOFILE=65536
+end script
 
-[Install]
-WantedBy=multi-user.target
+post-start script
+    logger "kube-apiserver is up"
+end script
+
+post-stop script
+    logger "kube-apiserver is stopped"
+end script

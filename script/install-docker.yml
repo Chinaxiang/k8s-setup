@@ -13,10 +13,20 @@
       dest: "/opt/"
     - src: "../sbin/libltdl7.deb"
       dest: "/opt/"
+    - src: "../sbin/libsystemd-journal0.deb"
+      dest: "/opt/"
     - src: "../sbin/conntrack.deb"
       dest: "/opt/"
+    - src: "../sbin/libmnl0.deb"
+      dest: "/opt/"
+    - src: "../sbin/libnetfilter-conntrack3.deb"
+      dest: "/opt/"  
   - block:
+    - shell: rm -rf /etc/init/docker.conf
     - shell: dpkg -i /opt/libltdl7.deb
+    - shell: dpkg -i /opt/libsystemd-journal0.deb
+    - shell: dpkg -i /opt/libmnl0.deb
+    - shell: dpkg -i /opt/libnetfilter-conntrack3.deb
     - shell: dpkg -i /opt/conntrack.deb
     - shell: dpkg -i /opt/docker-ce.deb
     ignore_errors: true 
@@ -24,10 +34,10 @@
     template:
       src: "template/docker/daemon.json"
       dest: "/etc/docker/"
-  - name: "copy docker.service to /lib/systemd/system/"
+  - name: "copy docker.service to /etc/init/docker.conf"
     copy:
       src: "template/docker/docker.service"
-      dest: "/lib/systemd/system/"
+      dest: "/etc/init/docker.conf"
   - name: "iptables setting"
     shell: "iptables -F && iptables -X \
             && iptables -F -t nat && iptables -X -t nat \
@@ -35,11 +45,11 @@
             && iptables -F -t mangle && iptables -X -t mangle \
             && iptables -P FORWARD ACCEPT"
   - block:
-    - shell: systemctl daemon-reload
-    - service: 
-        name: docker
-        state: restarted
-    - shell: systemctl status docker
+    - shell: initctl stop docker
+      ignore_errors: true 
+    - shell: initctl start docker
+      ignore_errors: true
+    - shell: initctl status docker
       register: result
     - debug:
         msg: "{{result.stdout}}"

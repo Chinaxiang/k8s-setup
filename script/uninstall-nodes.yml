@@ -1,23 +1,12 @@
+# 卸载nodes
 ---
 - hosts: "k8s-nodes"
   vars_files:
   - "../config/config.yml"
   tasks:
-  - service: 
-      name: kube-proxy
-      state: stopped
+  - shell: stop kube-proxy
     ignore_errors: true 
-  - service: 
-      name: kube-proxy
-      enabled: no
-    ignore_errors: true 
-  - service: 
-      name: kubelet
-      state: stopped
-    ignore_errors: true 
-  - service: 
-      name: kubelet
-      enabled: no
+  - shell: stop kubelet
     ignore_errors: true 
   - name: "copy clear script to all nodes"
     copy:
@@ -33,5 +22,5 @@
   - shell: rm -rf /usr/bin/kube-proxy
   - shell: rm -rf /usr/bin/kubelet
   - shell: rm -rf /usr/bin/kubectl
-  - shell: rm -rf /lib/systemd/system/kube-proxy.service
-  - shell: rm -rf /lib/systemd/system/kubelet.service
+  - shell: rm -rf /etc/init/kube-proxy.conf
+  - shell: rm -rf /etc/init/kubelet.conf
