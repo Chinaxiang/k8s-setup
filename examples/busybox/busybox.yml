@@ -6,6 +6,7 @@ metadata:
   labels:
     k8s-app: busybox
 spec:
+  replicas: 1
   template:
     metadata:
       labels:

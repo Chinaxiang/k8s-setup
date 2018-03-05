@@ -7,12 +7,14 @@
 
 [k8s-nodes]
 10.211.55.15
+10.211.55.16
 
 [k8s-cli]
 10.211.55.15
 
 [k8s-all]
 10.211.55.15 hostname=k8s-15 node_ip=10.211.55.15
+10.211.55.16 hostname=k8s-16 node_ip=10.211.55.16
 
 [all:vars]
 ansible_user=ubuntu
