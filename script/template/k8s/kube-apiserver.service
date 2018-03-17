@@ -12,14 +12,14 @@ ExecStart=/usr/bin/kube-apiserver \
     $KUBE_LOGTOSTDERR \
     $KUBE_LOG_LEVEL \
     $KUBE_ALLOW_PRIV \
-    $KUBE_ADDRESS \
-    $KUBE_ETCD \
-    $KUBE_SERVICE_ADDRESSES \
-    $KUBE_ADMISSION_CONTROL \
-    $KUBE_AUDIT \
-    $KUBE_AUTH \
-    $KUBE_TLS \
-    $KUBE_ARGS
+    $KUBE_API_ADDRESS \
+    $KUBE_API_ETCD \
+    $KUBE_API_SERVICE_ADDRESSES \
+    $KUBE_API_ADMISSION_CONTROL \
+    $KUBE_API_AUDIT \
+    $KUBE_API_AUTH \
+    $KUBE_API_TLS \
+    $KUBE_API_ARGS
 Restart=on-failure
 RestartSec=5
 LimitNOFILE=65536

@@ -11,9 +11,9 @@ ExecStart=/usr/bin/kube-controller-manager \
     $KUBE_LOG_DIR \
     $KUBE_LOGTOSTDERR \
     $KUBE_LOG_LEVEL \
-    $KUBE_TLS \
-    $KUBE_CONFIG \
-    $KUBE_ARGS
+    $KUBE_CONTROLLER_TLS \
+    $KUBE_CONTROLLER_CONFIG \
+    $KUBE_CONTROLLER_ARGS
 Restart=on-failure
 RestartSec=5
 LimitNOFILE=65536

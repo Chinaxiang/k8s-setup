@@ -11,8 +11,8 @@ ExecStart=/usr/bin/kube-scheduler \
     $KUBE_LOG_DIR \
     $KUBE_LOGTOSTDERR \
     $KUBE_LOG_LEVEL \
-    $KUBE_CONFIG \
-    $KUBE_ARGS
+    $KUBE_SCHEDULER_CONFIG \
+    $KUBE_SCHEDULER_ARGS
 Restart=on-failure
 RestartSec=5
 LimitNOFILE=65536

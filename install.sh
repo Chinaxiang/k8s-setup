@@ -104,8 +104,8 @@ while [ $# -gt 0 ]; do
 done
 
 note "This script will install components:
-1.Install k8s cluster(eg. etcd, network(flannel or calico), kubernetes, docker)
-2.Install CoreDNS or Kube-DNS plugin
+1.Install k8s cluster(eg. etcd, network, kubernetes, docker)
+2.Install CoreDNS plugin
 3.Install Kubernetes Dashboard plugin
 4.Install Heapster Monitor plugin
 5.Install Traefik Ingress plugin"
@@ -115,18 +115,16 @@ h2 "[Step $item]: checking installation environment ..."; let item+=1
 check_ansible
 h2 "[Step $item]: prepare k8s cluster ..."; let item+=1
 ansible-playbook -i config/hosts script/prepare-k8s.yml
-h2 "[Step $item]: prepare tls files ..."; let item+=1
-ansible-playbook -i config/hosts script/install-tls.yml
 h2 "[Step $item]: install etcd cluster ..."; let item+=1
 ansible-playbook -i config/hosts script/install-etcd.yml
-h2 "[Step $item]: install flannel ..."; let item+=1
-ansible-playbook -i config/hosts script/install-flanneld.yml
 h2 "[Step $item]: install docker ..."; let item+=1
 ansible-playbook -i config/hosts script/install-docker.yml
 h2 "[Step $item]: install calico ..."; let item+=1
 ansible-playbook -i config/hosts script/install-calico.yml
 h2 "[Step $item]: install masters ..."; let item+=1
 ansible-playbook -i config/hosts script/install-masters.yml
+h2 "[Step $item]: install loadbalance ..."; let item+=1
+ansible-playbook -i config/hosts script/install-lb.yml
 h2 "[Step $item]: install nodes ..."; let item+=1
 ansible-playbook -i config/hosts script/install-nodes.yml
 
@@ -135,8 +133,6 @@ h2 "[Step $item]: install calico controller ..."; let item+=1
 ansible-playbook -i config/hosts plugins/calico/install-calico.yml
 h2 "[Step $item]: install coredns ..."; let item+=1
 ansible-playbook -i config/hosts plugins/coredns/install-coredns.yml
-h2 "[Step $item]: install kube-dns ..."; let item+=1
-ansible-playbook -i config/hosts plugins/kube-dns/install-kube-dns.yml
 h2 "[Step $item]: install heapster monitor ..."; let item+=1
 ansible-playbook -i config/hosts plugins/heapster/install-heapster.yml
 h2 "[Step $item]: install kubernetes dashboard ..."; let item+=1

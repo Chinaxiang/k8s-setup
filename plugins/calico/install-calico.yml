@@ -1,4 +1,19 @@
 ---
+- hosts: "k8s-nodes"
+  vars_files:
+  - "../../config/config.yml"
+  tasks:
+  - name: "copy files to k8s-nodes"
+    template:
+      src: "calico-csr.json"
+      dest: "/etc/kubernetes/ssl/"
+  - shell: "cd /etc/kubernetes/ssl && cfssl gencert \
+            -ca=ca.pem \
+            -ca-key=ca-key.pem \
+            -config=ca-config.json \
+            -profile=kubernetes calico-csr.json | cfssljson -bare calico"
+  - shell: "cd /etc/kubernetes/ssl && cp ca.pem etcd-ca && cp calico.pem etcd-cert && cp calico-key.pem etcd-key"
+
 - hosts: "k8s-cli"
   vars_files:
   - "../../config/config.yml"
@@ -7,27 +22,22 @@
     file:
       path: "/opt/k8s/calico"
       state: directory
-    when: k8s.network == "calico"
   - name: "copy files to k8s-cli"
     template:
       src: "{{item}}"
       dest: "/opt/k8s/calico/"
-    when: k8s.network == "calico"
     with_items:
     - "calico.yaml"
     - "rbac.yaml"
   - name: "create calico"
     shell: "cd /opt/k8s/calico/ && kubectl --kubeconfig /etc/kubernetes/kubeconfig create -f ."
-    when: k8s.network == "calico"
     register: result
   - name: "create result"
     debug:
       msg: "{{result.stdout}}"
-    when: k8s.network == "calico"
 
 - hosts: "k8s-nodes"
   vars_files:
   - "../../config/config.yml"
   tasks:
   - shell: rm -rf /etc/cni/net.d/10-default.conf
-    when: k8s.network == "calico"

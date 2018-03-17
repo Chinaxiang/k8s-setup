@@ -12,11 +12,10 @@ https://hub.docker.com/r/mirrorgooglecontainers/kubernetes-dashboard-amd64/tags/
 
 将会部署如下组件：
 
-- etcd: 分布式存储服务，供k8s存储配置，版本:3.2.13
-- flannel: （可选）虚拟网络服务，支撑容器网络，版本:0.9.1
-- calico: （可选）虚拟网络服务，支撑容器网络，版本:2.0
-- docker: 容器服务，版本:docker-ce 17.12
-- k8s: kubernetes核心组件，版本：1.9.2
+- etcd
+- calico
+- docker
+- k8s: kubernetes核心组件，版本：1.9.4
 	- kube-apiserver
 	- kube-controller-manager
 	- kube-scheduler
@@ -25,7 +24,6 @@ https://hub.docker.com/r/mirrorgooglecontainers/kubernetes-dashboard-amd64/tags/
 	- kube-proxy
 - k8s-plugins: kubernetes核心插件
   - calico
-  - kube-dns
   - coredns
   - heapster
   - kubernetes-dashboard

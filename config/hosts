@@ -5,14 +5,19 @@
 10.211.55.14 etcd_name=etcd3
 
 [k8s-masters]
+10.211.55.11
 10.211.55.12
+
+[lb]
+10.211.55.11 lb_role=master
+10.211.55.12 lb_role=backup
 
 [k8s-nodes]
 10.211.55.11
 10.211.55.14
 
 [k8s-cli]
-10.211.55.12
+10.211.55.11
 
 [k8s-all]
 10.211.55.11 hostname=k8s-11 node_ip=10.211.55.11

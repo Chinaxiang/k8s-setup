@@ -4,8 +4,7 @@ Documentation=https://docs.docker.com
 
 [Service]
 Type=notify
-EnvironmentFile=-/run/flannel/docker
-ExecStart=/usr/bin/dockerd --log-opt max-size=10m --log-opt max-file=3 $DOCKER_NETWORK_OPTIONS
+ExecStart=/usr/bin/dockerd --log-opt max-size=256m --log-opt max-file=4
 ExecStartPost=/sbin/iptables -I FORWARD -s 0.0.0.0/0 -j ACCEPT
 ExecReload=/bin/kill -s HUP $MAINPID
 Restart=on-failure

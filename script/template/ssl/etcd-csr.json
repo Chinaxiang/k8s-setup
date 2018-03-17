@@ -1,6 +1,9 @@
 {
-    "CN": "admin",
-    "hosts": [],
+    "CN": "etcd",
+    "hosts": [
+        "127.0.0.1",
+        "{{node_ip}}"
+    ],
     "key": {
         "algo": "rsa",
         "size": 2048
@@ -10,7 +13,7 @@
             "C": "CN",
             "ST": "SuZhou",
             "L": "SuZhou",
-            "O": "system:masters",
+            "O": "k8s",
             "OU": "System"
         }
     ]

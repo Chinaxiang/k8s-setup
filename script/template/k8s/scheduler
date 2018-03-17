@@ -1,2 +1,2 @@
-KUBE_CONFIG="--master=127.0.0.1:8080"
-KUBE_ARGS="--leader-elect=true"
+KUBE_SCHEDULER_CONFIG="--master=127.0.0.1:8080"
+KUBE_SCHEDULER_ARGS="--leader-elect=true"

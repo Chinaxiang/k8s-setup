@@ -1,0 +1,65 @@
+---
+- hosts: "lb"
+  vars_files:
+  - "../config/config.yml"
+  tasks:
+  - name: "copy files to all nodes"
+    copy:
+      src: "{{item.src}}"
+      dest: "{{item.dest}}"
+      mode: 0755
+    with_items:
+    - src: "../sbin/haproxy.deb"
+      dest: "/opt/"
+    - src: "../sbin/liblua5.3.deb"
+      dest: "/opt/"
+    - src: "../sbin/keepalived.deb"
+      dest: "/opt/"
+    - src: "../sbin/libsensors4.deb"
+      dest: "/opt/"
+    - src: "../sbin/libsnmp-base.deb"
+      dest: "/opt/"
+    - src: "../sbin/libsnmp30.deb"
+      dest: "/opt/"
+  - block:
+    - shell: dpkg -i /opt/liblua5.3.deb
+    - shell: dpkg -i /opt/haproxy.deb
+    - shell: dpkg -i /opt/libsensors4.deb
+    - shell: dpkg -i /opt/libsnmp-base.deb
+    - shell: dpkg -i /opt/libsnmp30.deb
+    - shell: dpkg -i /opt/keepalived.deb
+    ignore_errors: true 
+  - name: "copy haproxy.cfg to /etc/haproxy/"
+    template:
+      src: "template/lb/haproxy.cfg"
+      dest: "/etc/haproxy/"
+  - name: "copy haproxy.service to /lib/systemd/system/"
+    copy:
+      src: "template/lb/haproxy.service"
+      dest: "/lib/systemd/system/"
+  - block:
+    - shell: systemctl daemon-reload
+    - service: 
+        name: haproxy
+        state: restarted
+    - shell: systemctl status haproxy
+      register: result
+    - debug:
+        msg: "{{result.stdout}}"
+  - name: "copy keepalived.conf to /etc/keepalived/"
+    template:
+      src: "template/lb/keepalived-{{lb_role}}.conf"
+      dest: "/etc/keepalived/keepalived.conf"
+  - name: "copy keepalived.service to /lib/systemd/system/"
+    copy:
+      src: "template/lb/keepalived.service"
+      dest: "/lib/systemd/system/"
+  - block:
+    - shell: systemctl daemon-reload
+    - service: 
+        name: keepalived
+        state: restarted
+    - shell: systemctl status keepalived
+      register: result
+    - debug:
+        msg: "{{result.stdout}}"
