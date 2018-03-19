@@ -1,0 +1,24 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: busybox
+  namespace: default
+  labels:
+    k8s-app: busybox
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        k8s-app: busybox
+        name: busybox
+    spec:
+      terminationGracePeriodSeconds: 0
+      restartPolicy: Always
+      containers:
+      - image: busybox
+        name: busybox
+        imagePullPolicy: IfNotPresent
+        command:
+        - sleep
+        - "86400"

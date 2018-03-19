@@ -7,18 +7,15 @@
       name: calico-node
       state: stopped
     ignore_errors: true 
-    when: k8s.network == "calico"
   - service: 
       name: calico-node
       enabled: no
     ignore_errors: true 
-    when: k8s.network == "calico"
   - block: 
     - shell: rm -rf /etc/cni
     - shell: rm -rf /var/run/calico*
     - shell: rm -rf /lib/systemd/system/calico-node.service
-    - shell: rm -rf /usr/bin/calico
-    - shell: rm -rf /usr/bin/calico-ipam
-    - shell: rm -rf /usr/bin/loopback
-    - shell: rm -rf /usr/bin/calicoctl
-    when: k8s.network == "calico"
+    - shell: rm -rf /usr/local/bin/calico
+    - shell: rm -rf /usr/local/bin/calico-ipam
+    - shell: rm -rf /usr/local/bin/loopback
+    - shell: rm -rf /usr/local/bin/calicoctl

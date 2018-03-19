@@ -44,8 +44,6 @@ note "Begin Uninstall."
 
 h2 "[Step $item]: uninstall coredns ..."; let item+=1
 ansible-playbook -i config/hosts plugins/coredns/delete-coredns.yml
-h2 "[Step $item]: uninstall kube-dns ..."; let item+=1
-ansible-playbook -i config/hosts plugins/kube-dns/delete-kube-dns.yml
 h2 "[Step $item]: uninstall heapster monitor ..."; let item+=1
 ansible-playbook -i config/hosts plugins/heapster/delete-heapster.yml
 h2 "[Step $item]: uninstall kubernetes dashboard ..."; let item+=1
@@ -70,8 +68,6 @@ h2 "[Step $item]: uninstall etcd cluster ..."; let item+=1
 ansible-playbook -i config/hosts script/uninstall-etcd.yml
 h2 "[Step $item]: uninstall calico ..."; let item+=1
 ansible-playbook -i config/hosts script/uninstall-calico.yml
-h2 "[Step $item]: uninstall flannel ..."; let item+=1
-ansible-playbook -i config/hosts script/uninstall-flanneld.yml
 h2 "[Step $item]: uninstall docker ..."; let item+=1
 
 tmp=0
