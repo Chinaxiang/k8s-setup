@@ -22,6 +22,10 @@
     - "cfssljson"
     - "cfssl-certinfo"
     - "kubectl"
+  - name: "copy logrotate file"
+    copy:
+      src: "template/log/allvarlogs"
+      dest: "/etc/logrotate.d/"
   - shell: rm -rf /etc/kubernetes/ssl
   - name: "copy cfssl to /usr/bin/"
     shell: "sed -i '/{{item.node_ip}}.*{{item.hostname}}/d' /etc/hosts && \

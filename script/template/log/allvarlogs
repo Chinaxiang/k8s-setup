@@ -1,0 +1,12 @@
+/var/log/*.log { 
+    rotate 5
+    copytruncate 
+    missingok 
+    notifempty 
+    compress 
+    maxsize 128M
+    daily 
+    dateext 
+    dateformat -%Y%m%d-%s 
+    create 0644 root root 
+}
