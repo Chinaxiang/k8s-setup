@@ -16,10 +16,6 @@ kubernetes dns插件之一，部署简单，性能稳定快速。
 
 kubernetes 监控指标搜集器。
 
-## kube-dns
-
-与coredns类似，比kube-dns早，需要多个镜像，稍繁琐。
-
 ## kubernetes-dashboard
 
 k8s ui 管理。

@@ -1,4 +1,3 @@
-# 卸载nodes
 ---
 - hosts: "k8s-nodes"
   vars_files:

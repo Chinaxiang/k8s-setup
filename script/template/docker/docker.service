@@ -47,7 +47,7 @@ script
   if [ -f /run/flannel/docker ]; then
     . /run/flannel/docker
   fi
-  exec "$DOCKERD" $DOCKER_OPTS $DOCKER_NETWORK_OPTIONS --log-opt max-size=10m --log-opt max-file=3 --raw-logs
+  exec "$DOCKERD" $DOCKER_OPTS $DOCKER_NETWORK_OPTIONS 
 end script
 
 # Don't emit "started" event until docker.sock is ready.

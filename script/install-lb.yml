@@ -1,0 +1,75 @@
+---
+- hosts: "lb"
+  vars_files:
+  - "../config/config.yml"
+  tasks:
+  - name: "copy files to all nodes"
+    copy:
+      src: "{{item.src}}"
+      dest: "{{item.dest}}"
+      mode: 0755
+    with_items:
+    - src: "../sbin/haproxy.deb"
+      dest: "/opt/"
+    - src: "../sbin/keepalived.deb"
+      dest: "/opt/"
+    - src: "../sbin/iproute.deb"
+      dest: "/opt/"
+    - src: "../sbin/ipvsadm.deb"
+      dest: "/opt/"
+    - src: "../sbin/libperl5.18.deb"
+      dest: "/opt/"
+    - src: "../sbin/perl-base.deb"
+      dest: "/opt/"
+    - src: "../sbin/libsensors4.deb"
+      dest: "/opt/"
+    - src: "../sbin/libsnmp-base.deb"
+      dest: "/opt/"
+    - src: "../sbin/libsnmp30.deb"
+      dest: "/opt/"
+  - block:
+    - shell: dpkg -i /opt/haproxy.deb
+    - shell: dpkg -i /opt/iproute.deb
+    - shell: dpkg -i /opt/ipvsadm.deb
+    - shell: dpkg -i /opt/libsensors4.deb
+    - shell: dpkg -i /opt/libsnmp-base.deb
+    - shell: dpkg -i /opt/perl-base.deb
+    - shell: dpkg -i /opt/libperl5.18.deb
+    - shell: dpkg -i /opt/libsnmp30.deb
+    - shell: dpkg -i /opt/keepalived.deb
+    ignore_errors: true 
+  - name: "copy haproxy.cfg to /etc/haproxy/"
+    template:
+      src: "template/lb/haproxy.cfg"
+      dest: "/etc/haproxy/"
+  # - name: "copy haproxy.service to /etc/init.d/"
+  #   copy:
+  #     src: "template/lb/haproxy.service"
+  #     dest: "/etc/init.d/haproxy"
+  #     mode: 0755
+  - block:
+    - shell: "sed -i 's/ENABLED=0/ENABLED=1/g' /etc/default/haproxy"
+    - service: 
+        name: haproxy
+        state: restarted
+    - shell: service haproxy status
+      register: result
+    - debug:
+        msg: "{{result.stdout}}"
+  - name: "copy keepalived.conf to /etc/keepalived/"
+    template:
+      src: "template/lb/keepalived-{{lb_role}}.conf"
+      dest: "/etc/keepalived/keepalived.conf"
+  # - name: "copy keepalived.service to /etc/init.d/"
+  #   copy:
+  #     src: "template/lb/keepalived.service"
+  #     dest: "/etc/init.d/keepalived"
+  #     mode: 0755
+  - block:
+    - service: 
+        name: keepalived
+        state: restarted
+    - shell: ip a
+      register: result
+    - debug:
+        msg: "{{result.stdout}}"

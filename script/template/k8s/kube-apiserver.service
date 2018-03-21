@@ -17,18 +17,18 @@ script
       . /etc/kubernetes/apiserver
     fi
     exec /usr/bin/kube-apiserver \
-    $KUBE_LOG_DIR \
     $KUBE_LOGTOSTDERR \
     $KUBE_LOG_LEVEL \
     $KUBE_ALLOW_PRIV \
-    $KUBE_ADDRESS \
-    $KUBE_ETCD \
-    $KUBE_SERVICE_ADDRESSES \
-    $KUBE_ADMISSION_CONTROL \
-    $KUBE_AUDIT \
-    $KUBE_AUTH \
-    $KUBE_TLS \
-    $KUBE_ARGS
+    $KUBE_API_ADDRESS \
+    $KUBE_API_ETCD \
+    $KUBE_API_SERVICE_ADDRESSES \
+    $KUBE_API_ADMISSION_CONTROL \
+    $KUBE_API_AUDIT \
+    $KUBE_API_AUTH \
+    $KUBE_API_TLS \
+    $KUBE_API_ARGS \
+    1>>/var/log/kube-apiserver.log 2>&1
 end script
 
 post-start script

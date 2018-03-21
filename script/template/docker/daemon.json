@@ -1,4 +1,5 @@
 {
+  "registry-mirrors": ["https://6l5d0zqd.mirror.aliyuncs.com"],
   "insecure-registries" : {{k8s.insecure_registries}},
   "max-concurrent-downloads": 6
 }

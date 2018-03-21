@@ -1,0 +1,1 @@
+DOCKER_OPTS="--log-opt max-size=256m --log-opt max-file=3 --raw-logs --bip 169.254.123.1/24"

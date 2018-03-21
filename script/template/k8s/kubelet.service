@@ -17,13 +17,13 @@ script
       . /etc/kubernetes/kubelet
     fi
     exec /usr/bin/kubelet \
-    $KUBE_LOG_DIR \
     $KUBE_LOGTOSTDERR \
     $KUBE_LOG_LEVEL \
     $KUBE_ALLOW_PRIV \
     $KUBELET_POD_INFRA_CONTAINER \
     $KUBELET_ARGS \
-    $KUBELET_NET
+    $KUBELET_NET \
+    1>>/var/log/kubelet.log 2>&1
 end script
 
 post-start script

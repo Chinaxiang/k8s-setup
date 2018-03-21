@@ -17,10 +17,10 @@ script
       . /etc/kubernetes/proxy
     fi
     exec /usr/bin/kube-proxy \
-    $KUBE_LOG_DIR \
     $KUBE_LOGTOSTDERR \
     $KUBE_LOG_LEVEL \
-    $KUBE_PROXY_ARGS
+    $KUBE_PROXY_ARGS \
+    1>>/var/log/kube-proxy.log 2>&1
 end script
 
 post-start script

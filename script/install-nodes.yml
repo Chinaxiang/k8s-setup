@@ -17,7 +17,7 @@
       dest: "/usr/bin/"
     - src: "../sbin/kube-proxy"
       dest: "/usr/bin/"
-    - src: "../sbin/kubectl"
+    - src: "../sbin/nsenter"
       dest: "/usr/bin/"
     - src: "template/k8s/kubelet.service"
       dest: "/etc/init/kubelet.conf"
@@ -32,22 +32,9 @@
       dest: "/etc/kubernetes/"
     - src: "template/k8s/proxy"
       dest: "/etc/kubernetes/"
-  - name: "template kubelet to nodes"
-    template:
-      src: "template/k8s/kubelet-calico"
+    - src: "template/k8s/kubelet"
       dest: "/etc/kubernetes/kubelet"
-    when: k8s.network == "calico"
-  - name: "template kubelet to nodes"
-    template:
-      src: "template/k8s/kubelet-flannel"
-      dest: "/etc/kubernetes/kubelet"
-    when: k8s.network == "flannel"
-  - block:
-    - shell: "swapoff -a"
-    - shell: "kubectl config set-cluster kubernetes --certificate-authority=/etc/kubernetes/ssl/ca.pem --embed-certs=true --server=https://{{k8s.apiserver}}:6443 --kubeconfig=/etc/kubernetes/kubeconfig"
-    - shell: "kubectl config set-credentials admin --client-certificate=/etc/kubernetes/ssl/admin.pem --client-key=/etc/kubernetes/ssl/admin-key.pem --embed-certs=true --kubeconfig=/etc/kubernetes/kubeconfig"
-    - shell: "kubectl config set-context kubernetes --cluster=kubernetes --user=admin --kubeconfig=/etc/kubernetes/kubeconfig"
-    - shell: "kubectl config use-context kubernetes --kubeconfig=/etc/kubernetes/kubeconfig"
+  - shell: "swapoff -a"
   - block:
     - shell: initctl stop kubelet
       ignore_errors: true 

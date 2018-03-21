@@ -1,4 +1,3 @@
-# 卸载calico
 ---
 - hosts: "k8s-nodes"
   vars_files:
@@ -8,12 +7,10 @@
       name: calico-node
       state: stopped
     ignore_errors: true 
-    when: k8s.network == "calico"
   - service: 
       name: calico-node
       enabled: no
     ignore_errors: true 
-    when: k8s.network == "calico"
   - block: 
     - shell: rm -rf /etc/cni
     - shell: rm -rf /var/run/calico*
@@ -21,4 +18,3 @@
     - shell: rm -rf /usr/local/bin/host-local
     - shell: rm -rf /usr/local/bin/loopback
     - shell: rm -rf /usr/local/bin/calicoctl
-    when: k8s.network == "calico"

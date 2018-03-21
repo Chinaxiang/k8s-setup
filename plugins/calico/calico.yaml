@@ -1,43 +1,57 @@
-# Calico Version v2.6.5
-# https://docs.projectcalico.org/v2.6/releases#v2.6.5
+# Calico Version v3.0.3
+# https://docs.projectcalico.org/v3.0/releases#v3.0.3
 # This manifest includes the following component versions:
-#   calico/node:v2.6.5
-#   calico/cni:v1.11.2
-#   calico/kube-controllers:v1.0.2
+#   calico/node:v3.0.3
+#   calico/cni:v2.0.1
+#   calico/kube-controllers:v2.0.1
+
+# This ConfigMap is used to configure a self-hosted Calico installation.
 kind: ConfigMap
 apiVersion: v1
 metadata:
   name: calico-config
   namespace: kube-system
 data:
-  etcd_endpoints: "{{etcd.servers}}"
+  etcd_endpoints: "{{ etcd.servers }}" 
   calico_backend: "bird"
   cni_network_config: |-
     {
-        "name": "k8s-pod-network",
-        "cniVersion": "0.1.0",
-        "type": "calico",
-        "etcd_endpoints": "{{etcd.servers}}",
-        "etcd_key_file": "/etc/kubernetes/ssl/kubernetes-key.pem",
-        "etcd_cert_file": "/etc/kubernetes/ssl/kubernetes.pem",
-        "etcd_ca_cert_file": "/etc/kubernetes/ssl/ca.pem",
-        "log_level": "info",
-        "mtu": 1500,
-        "ipam": {
-            "type": "calico-ipam"
+      "name": "k8s-pod-network",
+      "cniVersion": "0.3.0",
+      "plugins": [
+        {
+            "type": "calico",
+            "etcd_endpoints": "{{ etcd.servers }}",
+            "etcd_key_file": "/etc/kubernetes/ssl/calico-key.pem",
+            "etcd_cert_file": "/etc/kubernetes/ssl/calico.pem",
+            "etcd_ca_cert_file": "/etc/kubernetes/ssl/ca.pem",
+            "log_level": "info",
+            "mtu": 1500,
+            "ipam": {
+                "type": "calico-ipam"
+            },
+            "policy": {
+                "type": "k8s"
+            },
+            "kubernetes": {
+                "kubeconfig": "/etc/kubernetes/kubeconfig" 
+            }
         },
-        "policy": {
-            "type": "k8s"
-        },
-        "kubernetes": {
-            "kubeconfig": "/etc/kubernetes/kubeconfig"
+        {
+          "type": "portmap",
+          "snat": true,
+          "capabilities": {"portMappings": true}
         }
+      ]
     }
+  etcd_ca: "/calico-secrets/etcd-ca" 
+  etcd_cert: "/calico-secrets/etcd-cert"
+  etcd_key: "/calico-secrets/etcd-key"
 
-  etcd_ca: "/calico-secrets/ca.pem"
-  etcd_cert: "/calico-secrets/kubernetes.pem"
-  etcd_key: "/calico-secrets/kubernetes-key.pem"
 ---
+# This manifest installs the calico/node container, as well
+# as the Calico CNI plugins and network config on
+# each master and worker node in a Kubernetes cluster.
 kind: DaemonSet
 apiVersion: extensions/v1beta1
 metadata:
@@ -49,6 +63,10 @@ spec:
   selector:
     matchLabels:
       k8s-app: calico-node
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
   template:
     metadata:
       labels:
@@ -80,16 +98,16 @@ spec:
               value: "k8s,bgp"
             - name: CALICO_DISABLE_FILE_LOGGING
               value: "true"
+            - name: CALICO_K8S_NODE_REF
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
             - name: FELIX_DEFAULTENDPOINTTOHOSTACTION
               value: "ACCEPT"
             - name: CALICO_IPV4POOL_CIDR
               value: "{{k8s.cluster_cidr}}"
             - name: CALICO_IPV4POOL_IPIP
               value: "off"
-            - name: CALICO_K8S_NODE_REF
-              valueFrom:
-                fieldRef:
-                  fieldPath: spec.nodeName
             - name: FELIX_IPV6SUPPORT
               value: "false"
             - name: FELIX_LOGSEVERITYSCREEN
@@ -112,16 +130,16 @@ spec:
                   name: calico-config
                   key: etcd_cert
             - name: IP
-              value: ""
+              value: "autodetect"
             # - name: IP_AUTODETECTION_METHOD
             #   value: ""
             - name: FELIX_HEALTHENABLED
               value: "true"
           securityContext:
             privileged: true
-          # resources:
-          #   requests:
-          #     cpu: 250m
+          resources:
+            requests:
+              cpu: 250m
           livenessProbe:
             httpGet:
               path: /liveness
@@ -147,6 +165,8 @@ spec:
           image: {{images.calico_cni}}
           command: ["/install-cni.sh"]
           env:
+            - name: CNI_CONF_NAME
+              value: "10-calico.conflist"
             - name: ETCD_ENDPOINTS
               valueFrom:
                 configMapKeyRef:
@@ -182,6 +202,9 @@ spec:
             path: /etc/kubernetes/ssl
 
 ---
+
+# This manifest deploys the Calico Kubernetes controllers.
+# See https://github.com/projectcalico/kube-controllers
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
@@ -215,13 +238,25 @@ spec:
           image: {{images.calico_kube_controllers}}
           env:
             - name: ETCD_ENDPOINTS
-              value: {{etcd.servers}}
+              valueFrom:
+                configMapKeyRef:
+                  name: calico-config
+                  key: etcd_endpoints
             - name: ETCD_CA_CERT_FILE
-              value: "/calico-secrets/ca.pem"
+              valueFrom:
+                configMapKeyRef:
+                  name: calico-config
+                  key: etcd_ca
             - name: ETCD_KEY_FILE
-              value: "/calico-secrets/kubernetes-key.pem"
+              valueFrom:
+                configMapKeyRef:
+                  name: calico-config
+                  key: etcd_key
             - name: ETCD_CERT_FILE
-              value: "/calico-secrets/kubernetes.pem"
+              valueFrom:
+                configMapKeyRef:
+                  name: calico-config
+                  key: etcd_cert
             - name: ENABLED_CONTROLLERS
               value: policy,profile,workloadendpoint,node
           volumeMounts:

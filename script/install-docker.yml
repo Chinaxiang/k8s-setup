@@ -34,6 +34,10 @@
     template:
       src: "template/docker/daemon.json"
       dest: "/etc/docker/"
+  - name: "copy default to /etc/default/"
+    template:
+      src: "template/docker/docker"
+      dest: "/etc/default/docker"
   - name: "copy docker.service to /etc/init/docker.conf"
     copy:
       src: "template/docker/docker.service"

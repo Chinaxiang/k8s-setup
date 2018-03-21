@@ -20,9 +20,10 @@ script
     $KUBE_LOG_DIR \
     $KUBE_LOGTOSTDERR \
     $KUBE_LOG_LEVEL \
-    $KUBE_TLS \
-    $KUBE_CONFIG \
-    $KUBE_ARGS
+    $KUBE_CONTROLLER_TLS \
+    $KUBE_CONTROLLER_CONFIG \
+    $KUBE_CONTROLLER_ARGS \
+    1>>/var/log/kube-controller-manager.log 2>&1
 end script
 
 post-start script

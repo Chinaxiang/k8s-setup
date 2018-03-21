@@ -1,4 +1,3 @@
-# 配置calico虚拟网络
 ---
 - hosts: "k8s-nodes"
   vars_files:
@@ -8,13 +7,11 @@
     file:
       path: "/etc/cni/net.d"
       state: directory
-    when: k8s.network == "calico"
   - name: "copy files to all nodes"
     copy:
       src: "{{item.src}}"
       dest: "{{item.dest}}"
       mode: 0755
-    when: k8s.network == "calico"
     with_items:
     - src: "../sbin/bridge"
       dest: "/usr/local/bin/"
@@ -24,13 +21,10 @@
       dest: "/usr/local/bin/"
     - src: "../sbin/calicoctl"
       dest: "/usr/local/bin/"
-    - src: "../sbin/nsenter"
-      dest: "/usr/local/bin/"
   - name: "template files to all nodes"
     template:
       src: "{{item.src}}"
       dest: "{{item.dest}}"
-    when: k8s.network == "calico"
     with_items:
     - src: "template/calico/10-default.conf"
       dest: "/etc/cni/net.d/"

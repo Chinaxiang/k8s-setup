@@ -1,43 +1,49 @@
----
 # ansible配置
 # 待管理主机的python命令
 ansible_python_interpreter: "/usr/bin/python"
-
+# 配置各节点hosts文件
+node_hosts:
+  - node_ip: 10.211.55.15
+    hostname: k8s-15
+  - node_ip: 10.211.55.16
+    hostname: k8s-16
 # k8s集群信息
 k8s:
-  apiserver: "10.211.55.15"
-  apiservercount: 1
+  master_vip: "10.211.55.13"
+  master_vport: 8443
+  apiservercount: 2
   iface: "eth0"
   insecure_registries: '["10.255.1.101"]'
-  # calico or flannel
-  network: calico
-  # coredns or kube-dns
-  dns: coredns
   cluster_ip_range: 10.10.0.0/16
   cluster_dns: 10.10.0.2
   cluster_svc: 10.10.0.1
   cluster_cidr: 172.10.0.0/16
+# k8s负载均衡
+lb: 
+  master1: 10.211.55.15:6443
+  master2: 10.211.55.16:6443
 # etcd集群配置信息
 etcd:
   cluster: "etcd1=https://10.211.55.15:2380"
   servers: "https://10.211.55.15:2379"
 # TLS证书配置
 tls:
-  # 证书hosts字段值，应该包含etcd,master节点,apiserver负载节点的所有IP
-  ips: '"10.211.55.15"'
-  # 证书拷贝目标机器列表
-  dest:
   - 10.211.55.16
-# 使用到的镜像
+# 使用到的镜像，请自行准备可用的镜像
 images:
-  pause_amd64: "10.255.1.101/library/pause-amd64:3.0"
-  calico_node: "10.255.1.101/library/calico-node:v2.6.5"
-  calico_cni: "10.255.1.101/library/calico-cni:v1.11.2"
-  calico_kube_controllers: "10.255.1.101/library/calico-kube-controllers:v1.0.2"
-  coredns: "10.255.1.101/library/coredns:1.0.3"
-  heapster_amd64: "10.255.1.101/library/heapster-amd64:v1.5.0"
-  k8s_dns_kube_dns_amd64: "10.255.1.101/library/k8s-dns-kube-dns-amd64:1.14.7"
-  k8s_dns_dnsmasq_nanny_amd64: "10.255.1.101/library/k8s-dns-dnsmasq-nanny-amd64:1.14.7"
-  k8s_dns_sidecar_amd64: "10.255.1.101/library/k8s-dns-sidecar-amd64:1.14.7"
-  kubernetes_dashboard_amd64: "10.255.1.101/library/kubernetes-dashboard-amd64:v1.8.0"
-  traefik: "10.255.1.101/library/traefik"
+  pause_amd64: "chinaxiang/pause-amd64:3.0"
+  calico_node: "calico/node:v3.0.3"
+  calico_cni: "calico/cni:v2.0.1"
+  calico_kube_controllers: "calico/kube-controllers:v2.0.1"
+  coredns: "coredns/coredns:1.1.0"
+  heapster_amd64: "chinaxiang/heapster-amd64:v1.5.0"
+  kubernetes_dashboard_amd64: "chinaxiang/kubernetes-dashboard-amd64:v1.8.0"
+  traefik: "traefik"
+  # pause_amd64: "10.255.1.101/library/pause-amd64:3.0"
+  # calico_node: "10.255.1.101/library/calico-node:v3.0.3"
+  # calico_cni: "10.255.1.101/library/calico-cni:v2.0.1"
+  # calico_kube_controllers: "10.255.1.101/library/calico-kube-controllers:v2.0.1"
+  # coredns: "10.255.1.101/library/coredns:1.1.0"
+  # heapster_amd64: "10.255.1.101/library/heapster-amd64:v1.5.0"
+  # kubernetes_dashboard_amd64: "10.255.1.101/library/kubernetes-dashboard-amd64:v1.8.0"
+  # traefik: "10.255.1.101/library/traefik"

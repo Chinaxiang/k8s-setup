@@ -64,6 +64,13 @@ spec:
       containers:
       - name: kubernetes-dashboard
         image: {{images.kubernetes_dashboard_amd64}}
+        resources:
+          limits:
+            cpu: 100m
+            memory: 50Mi
+          requests:
+            cpu: 100m
+            memory: 50Mi
         args:
         - --heapster-host=http://heapster
         ports:

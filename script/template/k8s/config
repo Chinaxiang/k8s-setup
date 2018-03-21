@@ -1,4 +1,3 @@
-KUBE_LOG_DIR="--log-dir=/var/log/kubernetes"
-KUBE_LOGTOSTDERR="--logtostderr=false"
+KUBE_LOGTOSTDERR="--logtostderr=true"
 KUBE_LOG_LEVEL="--v=2"
 KUBE_ALLOW_PRIV="--allow-privileged=true"

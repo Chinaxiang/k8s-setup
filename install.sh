@@ -44,45 +44,45 @@ item=0
 
 # check ansible
 function check_ansible {
-	if ! ansible-playbook --version &> /dev/null
-	then
-		error "Need to install ansible(2.4.x+) first and run this script again."
-		exit 1
-	fi
-	
-	# ansible has been installed and check its version
-	if [[ $(ansible-playbook --version) =~ (([0-9]+).([0-9]+).([0-9]+)) ]]
-	then
-		ansible_version=${BASH_REMATCH[1]} # 2.4.1
-		ansible_version_part1=${BASH_REMATCH[2]} # 2
-		ansible_version_part2=${BASH_REMATCH[3]} # 4
-		
-    # the version of ansible_version does not meet the requirement
-    if [ "$ansible_version_part1" -lt 2 ] || ([ "$ansible_version_part1" -eq 2 ] && [ "$ansible_version_part2" -lt 4 ])
-    then
-        error "Need to upgrade ansible_version package to 2.4.x+."
-        exit 1
-    else
-        note "ansible version: $ansible_version"
-    fi
-	else
-		error "Failed to parse ansible version."
-		exit 1
-	fi
+  if ! ansible-playbook --version &> /dev/null
+  then
+    error "Need to install ansible(2.4.x+) first and run this script again."
+    exit 1
+  fi
+  
+  # ansible has been installed and check its version
+  if [[ $(ansible-playbook --version) =~ (([0-9]+).([0-9]+).([0-9]+)) ]]
+  then
+    ansible_version=${BASH_REMATCH[1]} # 2.4.1
+    ansible_version_part1=${BASH_REMATCH[2]} # 2
+    ansible_version_part2=${BASH_REMATCH[3]} # 4
+    
+        # the version of ansible_version does not meet the requirement
+        if [ "$ansible_version_part1" -lt 2 ] || ([ "$ansible_version_part1" -eq 2 ] && [ "$ansible_version_part2" -lt 4 ])
+        then
+            error "Need to upgrade ansible_version package to 2.4.x+."
+            exit 1
+        else
+            note "ansible version: $ansible_version"
+        fi
+  else
+    error "Failed to parse ansible version."
+    exit 1
+  fi
 }
 
 # check
 function check {
-	h2 "Check Inventory Hosts";
-	check_ansible
-	ansible -i config/hosts all -m ping
+  h2 "Check Inventory Hosts";
+  check_ansible
+  ansible -i config/hosts all -m ping
 }
 
 # check python3
 function check3 {
-	h2 "Check Inventory Hosts Use python3";
-	check_ansible
-	ansible -i config/hosts all -m ping -e "ansible_python_interpreter=/usr/bin/python3"
+  h2 "Check Inventory Hosts Use python3";
+  check_ansible
+  ansible -i config/hosts all -m ping -e "ansible_python_interpreter=/usr/bin/python3"
 }
 
 while [ $# -gt 0 ]; do
@@ -95,7 +95,7 @@ while [ $# -gt 0 ]; do
         exit 0;;
         check3)
         check3
-        exit 0;; 					 	
+        exit 0;;            
         *)
         note "$usage"
         exit 1;;
@@ -104,8 +104,8 @@ while [ $# -gt 0 ]; do
 done
 
 note "This script will install components:
-1.Install k8s cluster(eg. etcd, network(flannel or calico), kubernetes, docker)
-2.Install CoreDNS or Kube-DNS plugin
+1.Install k8s cluster(eg. etcd, network, kubernetes, docker)
+2.Install CoreDNS plugin
 3.Install Kubernetes Dashboard plugin
 4.Install Heapster Monitor plugin
 5.Install Traefik Ingress plugin"
@@ -115,18 +115,16 @@ h2 "[Step $item]: checking installation environment ..."; let item+=1
 check_ansible
 h2 "[Step $item]: prepare k8s cluster ..."; let item+=1
 ansible-playbook -i config/hosts script/prepare-k8s.yml
-h2 "[Step $item]: prepare tls files ..."; let item+=1
-ansible-playbook -i config/hosts script/install-tls.yml
 h2 "[Step $item]: install etcd cluster ..."; let item+=1
 ansible-playbook -i config/hosts script/install-etcd.yml
-h2 "[Step $item]: install flannel ..."; let item+=1
-ansible-playbook -i config/hosts script/install-flanneld.yml
 h2 "[Step $item]: install docker ..."; let item+=1
 ansible-playbook -i config/hosts script/install-docker.yml
 h2 "[Step $item]: install calico ..."; let item+=1
 ansible-playbook -i config/hosts script/install-calico.yml
 h2 "[Step $item]: install masters ..."; let item+=1
 ansible-playbook -i config/hosts script/install-masters.yml
+h2 "[Step $item]: install loadbalance ..."; let item+=1
+ansible-playbook -i config/hosts script/install-lb.yml
 h2 "[Step $item]: install nodes ..."; let item+=1
 ansible-playbook -i config/hosts script/install-nodes.yml
 
@@ -137,8 +135,6 @@ h2 "[Step $item]: install calico controller ..."; let item+=1
 ansible-playbook -i config/hosts plugins/calico/install-calico.yml
 h2 "[Step $item]: install coredns ..."; let item+=1
 ansible-playbook -i config/hosts plugins/coredns/install-coredns.yml
-h2 "[Step $item]: install kube-dns ..."; let item+=1
-ansible-playbook -i config/hosts plugins/kube-dns/install-kube-dns.yml
 h2 "[Step $item]: install heapster monitor ..."; let item+=1
 ansible-playbook -i config/hosts plugins/heapster/install-heapster.yml
 h2 "[Step $item]: install kubernetes dashboard ..."; let item+=1

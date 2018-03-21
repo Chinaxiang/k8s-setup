@@ -4,6 +4,11 @@
 
 [k8s-masters]
 10.211.55.15
+10.211.55.16
+
+[lb]
+10.211.55.15 lb_role=master
+10.211.55.16 lb_role=backup
 
 [k8s-nodes]
 10.211.55.15
