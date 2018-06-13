@@ -37,6 +37,7 @@ spec:
   ports:
   - port: 80
     targetPort: 9090
+    nodePort: 9090
 
 ---
 
@@ -66,8 +67,8 @@ spec:
         image: {{images.kubernetes_dashboard_amd64}}
         resources:
           limits:
-            cpu: 100m
-            memory: 50Mi
+            cpu: 1000m
+            memory: 500Mi
           requests:
             cpu: 100m
             memory: 50Mi

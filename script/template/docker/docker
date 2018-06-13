@@ -1,1 +1,1 @@
-DOCKER_OPTS="--log-opt max-size=128m --log-opt max-file=5 --raw-logs --bip 169.254.123.1/24"
+DOCKER_OPTS="--log-opt max-size=128m --log-opt max-file=7 --raw-logs --bip 169.254.123.1/24"

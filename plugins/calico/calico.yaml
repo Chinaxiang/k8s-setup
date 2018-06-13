@@ -106,6 +106,7 @@ spec:
               value: "ACCEPT"
             - name: CALICO_IPV4POOL_CIDR
               value: "{{k8s.cluster_cidr}}"
+            # off always
             - name: CALICO_IPV4POOL_IPIP
               value: "off"
             - name: FELIX_IPV6SUPPORT
@@ -132,7 +133,8 @@ spec:
             - name: IP
               value: "autodetect"
             # - name: IP_AUTODETECTION_METHOD
-            #   value: ""
+            #   value: "interface=eth0"
+            #   value: "can-reach={master_ip}"
             - name: FELIX_HEALTHENABLED
               value: "true"
           securityContext:

@@ -7,6 +7,7 @@
     file:
       path: "/var/lib/kubelet"
       state: directory
+    ignore_errors: true 
   - name: "copy files to nodes"
     copy:
       src: "{{item.src}}"

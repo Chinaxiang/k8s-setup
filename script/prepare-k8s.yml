@@ -7,7 +7,7 @@
     file:
       path: "/etc/kubernetes"
       state: directory
-      mode: 0777
+      # mode: 0777
   - name: "mkdir /root/.kube"
     file:
       path: "/root/.kube"
@@ -22,19 +22,39 @@
     - "cfssljson"
     - "cfssl-certinfo"
     - "kubectl"
+    - "docker-compose"
   - name: "copy logrotate file"
     copy:
       src: "template/log/allvarlogs"
       dest: "/etc/logrotate.d/"
   - shell: rm -rf /etc/kubernetes/ssl
-  - name: "copy cfssl to /usr/bin/"
+  - name: "modify /etc/hosts option"
     shell: "sed -i '/{{item.node_ip}}.*{{item.hostname}}/d' /etc/hosts && \
             echo '{{item.node_ip}} {{item.hostname}}' >> /etc/hosts"
     with_items:
     - "{{node_hosts}}"
 
 # 生成ca证书并拷贝到其它机器
-- hosts: "k8s-cli"
+# - hosts: "k8s-cli"
+#   vars_files:
+#   - "../config/config.yml"
+#   tasks:
+#   - name: "copy tls config files to /etc/kubernetes/ssl"
+#     template:
+#       src: "template/ssl/{{item}}"
+#       dest: "/etc/kubernetes/ssl/"
+#     with_items:
+#     - "ca-csr.json"
+#     - "ca-config.json"
+#   - name: "create ca.pem and ca-key.pem"
+#     shell: "cd /etc/kubernetes/ssl && cfssl gencert -initca ca-csr.json | cfssljson -bare ca"
+#   - name: "scp tls files to dest"
+#     shell: "scp -r /etc/kubernetes/ssl {{ansible_user}}@{{item}}:/etc/kubernetes/"
+#     with_items:
+#     - "{{tls}}"
+
+# 准备kubeconfig
+- hosts: "k8s-all"
   vars_files:
   - "../config/config.yml"
   tasks:
@@ -45,18 +65,8 @@
     with_items:
     - "ca-csr.json"
     - "ca-config.json"
-  - name: "create ca.pem and ca-key.pem"
-    shell: "cd /etc/kubernetes/ssl && cfssl gencert -initca ca-csr.json | cfssljson -bare ca"
-  - name: "scp tls files to dest"
-    shell: "scp -r /etc/kubernetes/ssl {{ansible_user}}@{{item}}:/etc/kubernetes/"
-    with_items:
-    - "{{tls}}"
-
-# 准备kubeconfig
-- hosts: "k8s-all"
-  vars_files:
-  - "../config/config.yml"
-  tasks:
+    - "ca.pem"
+    - "ca-key.pem"
   - name: "copy admin-csr.json to cluster"
     template:
       src: "template/ssl/admin-csr.json"

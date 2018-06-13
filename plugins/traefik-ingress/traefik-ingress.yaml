@@ -6,7 +6,7 @@ metadata:
 ---
 
 kind: ClusterRoleBinding
-apiVersion: rbac.authorization.k8s.io/v1
+apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
   name: ingress
 subjects:
@@ -19,27 +19,79 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
 
 ---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: traefik-conf
+  namespace: kube-system
+data:
+  traefik.toml: |
+    defaultEntryPoints = ["http"]
+    [entryPoints]
+      [entryPoints.http]
+      address = ":80"
+      [entryPoints.traefik]
+      address = ":8580"
+        [entryPoints.traefik.auth]
+          [entryPoints.traefik.auth.basic]
+          users = [
+            "admin:$apr1$sn6Vy5G0$d/hT7MU1F4jIs8rgUD0BB."
+          ]
+    [ping]
+    [traefikLog]
+    logLevel = "INFO"
+    format = "json"
+    [accessLog]
+    format = "json"
+    [rest]
+    [api]
+      [api.statistics]
+    [metrics]
+      [metrics.prometheus]
+    [kubernetes]
+
+---
 apiVersion: extensions/v1beta1
 kind: DaemonSet
 metadata:
-  name: traefik-ingress-lb
+  name: traefik
   namespace: kube-system
-  labels:
-    k8s-app: traefik-ingress-lb
 spec:
   template:
     metadata:
+      name: traefik
       labels:
-        k8s-app: traefik-ingress-lb
-        name: traefik-ingress-lb
+        k8s-app: traefik
     spec:
       terminationGracePeriodSeconds: 60
       hostNetwork: true
       restartPolicy: Always
       serviceAccountName: ingress
+      volumes:
+      - name: config
+        configMap:
+          name: traefik-conf
+      - name: localtime
+        hostPath:
+          path: /etc/localtime
       containers:
       - image: {{images.traefik}}
-        name: traefik-ingress-lb
+        name: traefik
+        env: 
+        - name: skynet_logs_console
+          value: "stdout"
+        - name: skynet_logs_console_format
+          value: "json"
+        - name: skynet_logs_console_tags
+          value: "cluster=aws-beeb"
+        - name: skynet_logs_console_target
+          value: "traefik"
+        volumeMounts:
+        - mountPath: "/config"
+          name: "config"
+        - mountPath: "/etc/localtime"
+          name: "localtime"
+          readOnly: true
         ports:
         - name: http
           containerPort: 80
@@ -48,6 +100,4 @@ spec:
           containerPort: 8580
           hostPort: 8580
         args:
-        - --web
-        - --web.address=:8580
-        - --kubernetes
+        - --configfile=/config/traefik.toml
