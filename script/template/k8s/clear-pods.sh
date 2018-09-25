@@ -6,3 +6,10 @@ for pod in $pods
 do
   umount -f $pod
 done
+
+pods=`cat /proc/mounts | grep 'kubelet' | awk '{print $2}'`
+
+for pod in $pods
+do
+  umount -f $pod
+done

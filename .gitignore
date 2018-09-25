@@ -5,5 +5,7 @@
 *.deb
 *.zip
 *.retry
+*.pem
 sbin/*
 !sbin/README.md
+\d+\.\d+\.\d+\.\d+

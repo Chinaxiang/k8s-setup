@@ -108,7 +108,7 @@ spec:
               value: "{{k8s.cluster_cidr}}"
             # off always
             - name: CALICO_IPV4POOL_IPIP
-              value: "off"
+              value: "always"
             - name: FELIX_IPV6SUPPORT
               value: "false"
             - name: FELIX_LOGSEVERITYSCREEN
@@ -132,9 +132,8 @@ spec:
                   key: etcd_cert
             - name: IP
               value: "autodetect"
-            # - name: IP_AUTODETECTION_METHOD
-            #   value: "interface=eth0"
-            #   value: "can-reach={master_ip}"
+            - name: IP_AUTODETECTION_METHOD
+              value: "interface=eth0"
             - name: FELIX_HEALTHENABLED
               value: "true"
           securityContext:

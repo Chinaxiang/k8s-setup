@@ -114,32 +114,30 @@ note "This script will install components:
 h2 "[Step $item]: checking installation environment ..."; let item+=1
 check_ansible
 h2 "[Step $item]: prepare k8s cluster ..."; let item+=1
-ansible-playbook -i config/hosts script/prepare-k8s.yml
+ansible-playbook -i config/hosts script/01prepare-k8s.yml
 h2 "[Step $item]: install etcd cluster ..."; let item+=1
-ansible-playbook -i config/hosts script/install-etcd.yml
+ansible-playbook -i config/hosts script/02install-etcd.yml
 h2 "[Step $item]: install docker ..."; let item+=1
-ansible-playbook -i config/hosts script/install-docker.yml
+ansible-playbook -i config/hosts script/03install-docker.yml
 h2 "[Step $item]: install calico ..."; let item+=1
-ansible-playbook -i config/hosts script/install-calico.yml
+ansible-playbook -i config/hosts script/04install-calico.yml
 h2 "[Step $item]: install masters ..."; let item+=1
-ansible-playbook -i config/hosts script/install-masters.yml
-h2 "[Step $item]: install loadbalance ..."; let item+=1
-ansible-playbook -i config/hosts script/install-lb.yml
+ansible-playbook -i config/hosts script/05install-masters.yml
 h2 "[Step $item]: install nodes ..."; let item+=1
-ansible-playbook -i config/hosts script/install-nodes.yml
+ansible-playbook -i config/hosts script/06install-nodes.yml
 
 exit 0
 
 note "Begin install plugins."
 h2 "[Step $item]: install calico controller ..."; let item+=1
-ansible-playbook -i config/hosts plugins/calico/install-calico.yml
+ansible-playbook -i config/hosts plugins/calico/07install-calico.yml
 h2 "[Step $item]: install coredns ..."; let item+=1
-ansible-playbook -i config/hosts plugins/coredns/install-coredns.yml
+ansible-playbook -i config/hosts plugins/coredns/08install-coredns.yml
 h2 "[Step $item]: install heapster monitor ..."; let item+=1
-ansible-playbook -i config/hosts plugins/heapster/install-heapster.yml
+ansible-playbook -i config/hosts plugins/heapster/09install-heapster.yml
 h2 "[Step $item]: install kubernetes dashboard ..."; let item+=1
-ansible-playbook -i config/hosts plugins/kubernetes-dashboard/install-kubernetes-dashboard.yml
+ansible-playbook -i config/hosts plugins/kubernetes-dashboard/10install-kubernetes-dashboard.yml
 h2 "[Step $item]: install traefik ingress ..."; let item+=1
-ansible-playbook -i config/hosts plugins/traefik-ingress/install-traefik-ingress.yml
+ansible-playbook -i config/hosts plugins/traefik-ingress/11install-traefik-ingress.yml
 
 success "Install Finished."

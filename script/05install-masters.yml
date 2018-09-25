@@ -57,7 +57,7 @@
         msg: "{{result.stdout}}"
   - block:
     - shell: initctl stop kube-controller-manager
-      ignore_errors: true 
+      ignore_errors: true
     - shell: initctl start kube-controller-manager
       ignore_errors: true
     - shell: initctl status kube-controller-manager

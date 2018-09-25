@@ -1,0 +1,236 @@
+---
+- hosts: "k8s-cli"
+  vars_files:
+  - "../config/config.yml"
+  tasks:
+  - name: fetch ca.pem
+    fetch: 
+      src: /etc/kubernetes/ssl/ca.pem
+      dest: template/ssl/
+  - name: fetch ca-key.pem
+    fetch: 
+      src: /etc/kubernetes/ssl/ca-key.pem
+      dest: template/ssl/
+
+- hosts: "new-nodes"
+  vars_files:
+  - "../config/config.yml"
+  tasks:
+  - name: "mkdir /data"
+    file:
+      path: "/data"
+      state: directory
+  - name: "mkdir /data/docker"
+    file:
+      path: "/data/docker"
+      state: directory
+  - name: "mkdir /data/kubelet"
+    file:
+      path: "/data/kubelet"
+      state: directory
+  - name: "mkdir /data/pods"
+    file:
+      path: "/data/pods"
+      state: directory
+  - name: "mkdir /data/uclog"
+    file:
+      path: "/data/uclog"
+      state: directory
+      mode: 0777
+  - name: "link /var/lib/docker to /data/docker"
+    file: 
+      src: /data/docker
+      dest: /var/lib/docker
+      state: link
+  - name: "link /var/lib/kubelet to /data/kubelet"
+    file: 
+      src: /data/kubelet
+      dest: /var/lib/kubelet
+      state: link
+  - name: "link /var/log/pods to /data/pods"
+    file: 
+      src: /data/pods
+      dest: /var/log/pods
+      state: link
+  - name: "link /var/log/uclog to /data/uclog"
+    file: 
+      src: /data/uclog
+      dest: /var/log/uclog
+      state: link
+  - name: "mkdir /etc/kubernetes"
+    file:
+      path: "/etc/kubernetes"
+      state: directory
+  - name: "copy cfssl to /usr/bin/"
+    copy:
+      src: "../sbin/{{item}}"
+      dest: "/usr/bin/"
+      mode: 0755
+    with_items:
+    - "cfssl"
+    - "cfssljson"
+    - "cfssl-certinfo"
+    - "kubectl"
+    - "docker-compose"
+  - name: "copy logrotate file"
+    copy:
+      src: "template/log/allvarlogs"
+      dest: "/etc/logrotate.d/"
+  - name: "copy tls config files to /etc/kubernetes/ssl"
+    template:
+      src: "template/ssl/{{item}}"
+      dest: "/etc/kubernetes/ssl/"
+    with_items:
+    - "ca-csr.json"
+    - "ca-config.json"
+    - "{{k8s.cli}}/etc/kubernetes/ssl/ca.pem"
+    - "{{k8s.cli}}/etc/kubernetes/ssl/ca-key.pem"
+  - name: "copy admin-csr.json to cluster"
+    template:
+      src: "template/ssl/admin-csr.json"
+      dest: "/etc/kubernetes/ssl/"
+  - name: "create admin.pem and admin-key.pem"
+    shell: "cd /etc/kubernetes/ssl/ && cfssl gencert \
+            -ca=ca.pem \
+            -ca-key=ca-key.pem \
+            -config=ca-config.json \
+            -profile=kubernetes admin-csr.json | cfssljson -bare admin"
+  - block:
+    - shell: "kubectl config set-cluster kubernetes --certificate-authority=/etc/kubernetes/ssl/ca.pem --embed-certs=true --server=https://{{k8s.master_vip}}:{{k8s.master_vport}} --kubeconfig=/etc/kubernetes/kubeconfig"
+    - shell: "kubectl config set-credentials admin --client-certificate=/etc/kubernetes/ssl/admin.pem --client-key=/etc/kubernetes/ssl/admin-key.pem --embed-certs=true --kubeconfig=/etc/kubernetes/kubeconfig"
+    - shell: "kubectl config set-context kubernetes --cluster=kubernetes --user=admin --kubeconfig=/etc/kubernetes/kubeconfig"
+    - shell: "kubectl config use-context kubernetes --kubeconfig=/etc/kubernetes/kubeconfig"
+  - name: "copy files to all nodes"
+    copy:
+      src: "{{item.src}}"
+      dest: "{{item.dest}}"
+      mode: 0755
+    with_items:
+    - src: "../sbin/docker-ce.deb"
+      dest: "/opt/"
+    - src: "../sbin/libltdl7.deb"
+      dest: "/opt/"
+    - src: "../sbin/libsystemd-journal0.deb"
+      dest: "/opt/"
+    - src: "../sbin/conntrack.deb"
+      dest: "/opt/"
+    - src: "../sbin/libmnl0.deb"
+      dest: "/opt/"
+    - src: "../sbin/libnetfilter-conntrack3.deb"
+      dest: "/opt/"
+  - block:
+    - shell: rm -rf /etc/init/docker.conf
+    - shell: dpkg -i /opt/libltdl7.deb
+    - shell: dpkg -i /opt/libsystemd-journal0.deb
+    - shell: dpkg -i /opt/libmnl0.deb
+    - shell: dpkg -i /opt/libnetfilter-conntrack3.deb
+    - shell: dpkg -i /opt/conntrack.deb
+    - shell: dpkg -i /opt/docker-ce.deb
+    ignore_errors: true
+  - name: "copy daemon.json to /etc/docker/"
+    template:
+      src: "template/docker/daemon.json"
+      dest: "/etc/docker/"
+  - name: "copy default to /etc/default/"
+    template:
+      src: "template/docker/docker"
+      dest: "/etc/default/docker"
+  - name: "copy docker.service to /etc/init/docker.conf"
+    copy:
+      src: "template/docker/docker.service"
+      dest: "/etc/init/docker.conf"
+  - name: "iptables setting"
+    shell: "iptables -F && iptables -X \
+            && iptables -F -t nat && iptables -X -t nat \
+            && iptables -F -t raw && iptables -X -t raw \
+            && iptables -F -t mangle && iptables -X -t mangle \
+            && iptables -P FORWARD ACCEPT"
+  - block:
+    - shell: initctl stop docker
+      ignore_errors: true 
+    - shell: initctl start docker
+      ignore_errors: true
+    - shell: initctl status docker
+      register: result
+    - debug:
+        msg: "{{result.stdout}}"
+  - shell: rm -rf /etc/cni/net.d
+  - name: "mkdir /etc/cni/net.d"
+    file:
+      path: "/etc/cni/net.d"
+      state: directory
+  - name: "copy files to all nodes"
+    copy:
+      src: "{{item.src}}"
+      dest: "{{item.dest}}"
+      mode: 0755
+    with_items:
+    - src: "../sbin/bridge"
+      dest: "/usr/local/bin/"
+    - src: "../sbin/host-local"
+      dest: "/usr/local/bin/"
+    - src: "../sbin/loopback"
+      dest: "/usr/local/bin/"
+    - src: "../sbin/calicoctl"
+      dest: "/usr/local/bin/"
+  - name: "template files to all nodes"
+    template:
+      src: "{{item.src}}"
+      dest: "{{item.dest}}"
+    with_items:
+    - src: "template/calico/10-default.conf"
+      dest: "/etc/cni/net.d/"
+    - src: "template/calico/calico-csr.json"
+      dest: "/etc/kubernetes/ssl/"
+  - shell: "cd /etc/kubernetes/ssl && cfssl gencert \
+            -ca=ca.pem \
+            -ca-key=ca-key.pem \
+            -config=ca-config.json \
+            -profile=kubernetes calico-csr.json | cfssljson -bare calico"
+  - shell: "cd /etc/kubernetes/ssl && cp ca.pem etcd-ca && cp calico.pem etcd-cert && cp calico-key.pem etcd-key"
+  - name: "copy files to nodes"
+    copy:
+      src: "{{item.src}}"
+      dest: "{{item.dest}}"
+      mode: 0755
+    with_items:
+    - src: "../sbin/kubelet"
+      dest: "/usr/bin/"
+    - src: "../sbin/kube-proxy"
+      dest: "/usr/bin/"
+    - src: "../sbin/nsenter"
+      dest: "/usr/bin/"
+    - src: "template/k8s/kubelet.service"
+      dest: "/etc/init/kubelet.conf"
+    - src: "template/k8s/kube-proxy.service"
+      dest: "/etc/init/kube-proxy.conf"
+  - name: "template files to nodes"
+    template:
+      src: "{{item.src}}"
+      dest: "{{item.dest}}"
+    with_items:
+    - src: "template/k8s/config"
+      dest: "/etc/kubernetes/"
+    - src: "template/k8s/proxy"
+      dest: "/etc/kubernetes/"
+    - src: "template/k8s/kubelet"
+      dest: "/etc/kubernetes/kubelet"
+  - shell: "swapoff -a"
+  - block:
+    - shell: initctl stop kubelet
+      ignore_errors: true 
+    - shell: initctl start kubelet
+      ignore_errors: true
+    - shell: initctl status kubelet
+      register: result
+    - debug:
+        msg: "{{result.stdout}}"
+  - block:
+    - shell: initctl stop kube-proxy
+      ignore_errors: true 
+    - shell: initctl start kube-proxy
+      ignore_errors: true
+    - shell: initctl status kube-proxy
+      register: result
+    - debug:
+        msg: "{{result.stdout}}"

@@ -20,7 +20,7 @@
     - src: "../sbin/libmnl0.deb"
       dest: "/opt/"
     - src: "../sbin/libnetfilter-conntrack3.deb"
-      dest: "/opt/"  
+      dest: "/opt/"
   - block:
     - shell: rm -rf /etc/init/docker.conf
     - shell: dpkg -i /opt/libltdl7.deb
@@ -29,7 +29,7 @@
     - shell: dpkg -i /opt/libnetfilter-conntrack3.deb
     - shell: dpkg -i /opt/conntrack.deb
     - shell: dpkg -i /opt/docker-ce.deb
-    ignore_errors: true 
+    ignore_errors: true
   - name: "copy daemon.json to /etc/docker/"
     template:
       src: "template/docker/daemon.json"

@@ -3,6 +3,7 @@
   vars_files:
   - "../config/config.yml"
   tasks:
+  - shell: rm -rf /etc/cni/net.d
   - name: "mkdir /etc/cni/net.d"
     file:
       path: "/etc/cni/net.d"

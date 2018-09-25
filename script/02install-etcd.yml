@@ -4,10 +4,12 @@
   vars_files:
   - "../config/config.yml"
   tasks:
+  - shell: rm -rf /var/lib/etcd
   - name: "mkdir /var/lib/etcd"
     file:
       path: "/var/lib/etcd"
       state: directory
+  - shell: rm -rf /etc/etcd
   - name: "mkdir /etc/etcd"
     file:
       path: "/etc/etcd"
@@ -41,7 +43,7 @@
             -profile=kubernetes etcd-csr.json | cfssljson -bare etcd"
   - block:
     - shell: initctl stop etcd
-      ignore_errors: true 
+      ignore_errors: true
     - shell: initctl start etcd
       ignore_errors: true
     - shell: initctl status etcd

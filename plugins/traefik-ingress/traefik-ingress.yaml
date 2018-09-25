@@ -77,15 +77,15 @@ spec:
       containers:
       - image: {{images.traefik}}
         name: traefik
-        env: 
-        - name: skynet_logs_console
-          value: "stdout"
-        - name: skynet_logs_console_format
-          value: "json"
-        - name: skynet_logs_console_tags
-          value: "cluster=aws-beeb"
-        - name: skynet_logs_console_target
-          value: "traefik"
+        # env: 
+        # - name: skynet_logs_console
+        #   value: "stdout"
+        # - name: skynet_logs_console_format
+        #   value: "json"
+        # - name: skynet_logs_console_tags
+        #   value: "cluster=aws-beeb"
+        # - name: skynet_logs_console_target
+        #   value: "traefik"
         volumeMounts:
         - mountPath: "/config"
           name: "config"

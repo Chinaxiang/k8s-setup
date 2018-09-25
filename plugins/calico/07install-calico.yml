@@ -29,15 +29,18 @@
     with_items:
     - "calico.yaml"
     - "rbac.yaml"
+    - "ipPool.yaml"
+  - name: "create calico ipPool"
+    shell: "cd /opt/k8s/calico/ && calicoctl apply -f ipPool.yaml"
   - name: "create calico"
-    shell: "cd /opt/k8s/calico/ && kubectl --kubeconfig /etc/kubernetes/kubeconfig create -f ."
+    shell: "cd /opt/k8s/calico/ && kubectl --kubeconfig /etc/kubernetes/kubeconfig create -f calico.yaml,rbac.yaml"
     register: result
   - name: "create result"
     debug:
       msg: "{{result.stdout}}"
 
-- hosts: "k8s-nodes"
-  vars_files:
-  - "../../config/config.yml"
-  tasks:
-  - shell: rm -rf /etc/cni/net.d/10-default.conf
+# - hosts: "k8s-nodes"
+#   vars_files:
+#   - "../../config/config.yml"
+#   tasks:
+#   - shell: rm -rf /etc/cni/net.d/10-default.conf

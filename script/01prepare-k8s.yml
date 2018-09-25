@@ -1,0 +1,128 @@
+---
+- hosts: 
+  - k8s-masters
+  - k8s-nodes
+  vars_files:
+  - "../config/config.yml"
+  tasks:
+  - name: "mkdir /data"
+    file:
+      path: "/data"
+      state: directory
+  - name: "mkdir /data/docker"
+    file:
+      path: "/data/docker"
+      state: directory
+  - name: "mkdir /data/kubelet"
+    file:
+      path: "/data/kubelet"
+      state: directory
+  - name: "mkdir /data/pods"
+    file:
+      path: "/data/pods"
+      state: directory
+  - name: "mkdir /data/uclog"
+    file:
+      path: "/data/uclog"
+      state: directory
+      mode: 0777
+  - name: "link /var/lib/docker to /data/docker"
+    file: 
+      src: /data/docker
+      dest: /var/lib/docker
+      state: link
+  - name: "link /var/lib/kubelet to /data/kubelet"
+    file: 
+      src: /data/kubelet
+      dest: /var/lib/kubelet
+      state: link
+  - name: "link /var/log/pods to /data/pods"
+    file: 
+      src: /data/pods
+      dest: /var/log/pods
+      state: link
+  - name: "link /var/log/uclog to /data/uclog"
+    file: 
+      src: /data/uclog
+      dest: /var/log/uclog
+      state: link
+  - shell: rm -rf /etc/kubernetes
+  - name: "mkdir /etc/kubernetes"
+    file:
+      path: "/etc/kubernetes"
+      state: directory
+  - name: "copy cfssl to /usr/bin/"
+    copy:
+      src: "../sbin/{{item}}"
+      dest: "/usr/bin/"
+      mode: 0755
+    with_items:
+    - "cfssl"
+    - "cfssljson"
+    - "cfssl-certinfo"
+    - "kubectl"
+    - "docker-compose"
+  - name: "copy logrotate file"
+    copy:
+      src: "template/log/allvarlogs"
+      dest: "/etc/logrotate.d/"
+  # - name: "modify /etc/hosts option"
+  #   shell: "sed -i '/{{item.node_ip}}.*{{item.hostname}}/d' /etc/hosts && \
+  #           echo '{{item.node_ip}} {{item.hostname}}' >> /etc/hosts"
+  #   with_items:
+  #   - "{{node_hosts}}"
+
+# 生成ca证书并拷贝回本机
+- hosts: "k8s-cli"
+  vars_files:
+  - "../config/config.yml"
+  tasks:
+  - name: "copy tls config files to /etc/kubernetes/ssl"
+    template:
+      src: "template/ssl/{{item}}"
+      dest: "/etc/kubernetes/ssl/"
+    with_items:
+    - "ca-csr.json"
+    - "ca-config.json"
+  - name: "create ca.pem and ca-key.pem"
+    shell: "cd /etc/kubernetes/ssl && cfssl gencert -initca ca-csr.json | cfssljson -bare ca"
+  - name: fetch ca.pem
+    fetch: 
+      src: /etc/kubernetes/ssl/ca.pem
+      dest: template/ssl/
+  - name: fetch ca-key.pem
+    fetch: 
+      src: /etc/kubernetes/ssl/ca-key.pem
+      dest: template/ssl/
+
+# 准备kubeconfig
+- hosts: 
+  - k8s-masters
+  - k8s-nodes
+  vars_files:
+  - "../config/config.yml"
+  tasks:
+  - name: "copy tls config files to /etc/kubernetes/ssl"
+    template:
+      src: "template/ssl/{{item}}"
+      dest: "/etc/kubernetes/ssl/"
+    with_items:
+    - "ca-csr.json"
+    - "ca-config.json"
+    - "{{k8s.cli}}/etc/kubernetes/ssl/ca.pem"
+    - "{{k8s.cli}}/etc/kubernetes/ssl/ca-key.pem"
+  - name: "copy admin-csr.json to cluster"
+    template:
+      src: "template/ssl/admin-csr.json"
+      dest: "/etc/kubernetes/ssl/"
+  - name: "create admin.pem and admin-key.pem"
+    shell: "cd /etc/kubernetes/ssl/ && cfssl gencert \
+            -ca=ca.pem \
+            -ca-key=ca-key.pem \
+            -config=ca-config.json \
+            -profile=kubernetes admin-csr.json | cfssljson -bare admin"
+  - block:
+    - shell: "kubectl config set-cluster kubernetes --certificate-authority=/etc/kubernetes/ssl/ca.pem --embed-certs=true --server=https://{{k8s.master_vip}}:{{k8s.master_vport}} --kubeconfig=/etc/kubernetes/kubeconfig"
+    - shell: "kubectl config set-credentials admin --client-certificate=/etc/kubernetes/ssl/admin.pem --client-key=/etc/kubernetes/ssl/admin-key.pem --embed-certs=true --kubeconfig=/etc/kubernetes/kubeconfig"
+    - shell: "kubectl config set-context kubernetes --cluster=kubernetes --user=admin --kubeconfig=/etc/kubernetes/kubeconfig"
+    - shell: "kubectl config use-context kubernetes --kubeconfig=/etc/kubernetes/kubeconfig"

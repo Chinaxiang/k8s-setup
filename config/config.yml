@@ -3,36 +3,26 @@
 ansible_python_interpreter: "/usr/bin/python"
 # 配置各节点hosts文件
 node_hosts:
-  - node_ip: 10.90.3.9
-    hostname: aws-beeb-docker1
-  - node_ip: 10.90.3.169
-    hostname: aws-beeb-docker2
-  - node_ip: 10.90.6.53
-    hostname: aws-beeb-docker3
+  - node_ip: 10.211.55.15
+    hostname: node1
+  - node_ip: 10.211.55.16
+    hostname: node2
 # k8s集群信息
 k8s:
-  master_vip: "10.90.3.254"
-  master_vport: 8443
-  apiservercount: 3
+  cli: 10.211.55.15
+  master_vip: 10.211.55.15
+  master_vport: 6443
+  apiservercount: 2
   iface: "eth0"
-  insecure_registries: '["10.255.1.101"]'
+  insecure_registries: '["192.168.83.123"]'
   cluster_ip_range: 10.10.0.0/16
   cluster_dns: 10.10.0.2
   cluster_svc: 10.10.0.1
   cluster_cidr: 172.10.0.0/16
-# k8s负载均衡
-lb: 
-  master1: 10.90.3.9:6443
-  master2: 10.90.3.169:6443
-  master3: 10.90.6.53:6443
 # etcd集群配置信息
 etcd:
-  cluster: "etcd1=https://10.90.3.9:2380,etcd2=https://10.90.3.169:2380,etcd3=https://10.90.6.53:2380"
-  servers: "https://10.90.3.9:2379,https://10.90.3.169:2379,https://10.90.6.53:2379"
-# TLS证书配置
-tls:
-  - 10.90.3.169
-  - 10.90.6.53
+  cluster: "etcd1=https://10.211.55.15:2380,etcd2=https://10.211.55.16:2380"
+  servers: "https://10.211.55.15:2379,https://10.211.55.16:2379"
 # 使用到的镜像，请自行准备可用的镜像
 images:
   # pause_amd64: "chinaxiang/pause-amd64:3.0"
@@ -43,11 +33,11 @@ images:
   # heapster_amd64: "chinaxiang/heapster-amd64:v1.5.0"
   # kubernetes_dashboard_amd64: "chinaxiang/kubernetes-dashboard-amd64:v1.8.0"
   # traefik: "traefik"
-  pause_amd64: "10.90.6.53:5000/library/pause-amd64:3.0"
-  calico_node: "10.90.6.53:5000/library/calico-node:v3.0.3"
-  calico_cni: "10.90.6.53:5000/library/calico-cni:v2.0.1"
-  calico_kube_controllers: "10.90.6.53:5000/library/calico-kube-controllers:v2.0.1"
-  coredns: "10.90.6.53:5000/library/coredns:1.1.0"
-  heapster_amd64: "10.90.6.53:5000/library/heapster-amd64:v1.5.0"
-  kubernetes_dashboard_amd64: "10.90.6.53:5000/library/kubernetes-dashboard-amd64:v1.8.0"
-  traefik: "10.90.6.53:5000/library/traefik"
+  pause_amd64: "192.168.83.123/library/pause-amd64:3.0"
+  calico_node: "192.168.83.123/library/calico-node:v3.0.3"
+  calico_cni: "192.168.83.123/library/calico-cni:v2.0.1"
+  calico_kube_controllers: "192.168.83.123/library/calico-kube-controllers:v2.0.1"
+  coredns: "192.168.83.123/library/coredns:1.1.0"
+  heapster_amd64: "192.168.83.123/library/heapster-amd64:v1.5.0"
+  kubernetes_dashboard_amd64: "192.168.83.123/library/kubernetes-dashboard-amd64:v1.8.0"
+  traefik: "192.168.83.123/library/traefik"

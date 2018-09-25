@@ -1,33 +1,23 @@
 # 主机目录配置
 [etcd]
-10.90.3.9 etcd_name=etcd1
-10.90.3.169 etcd_name=etcd2
-10.90.6.53 etcd_name=etcd3
+10.211.55.15 etcd_name=etcd1 node_ip=10.211.55.15
+10.211.55.16 etcd_name=etcd2 node_ip=10.211.55.16
 
 [k8s-masters]
-10.90.3.9
-10.90.3.169
-10.90.6.53
-
-[lb]
-10.90.3.9 lb_role=master
-10.90.3.169 lb_role=backup
-10.90.6.53 lb_role=backup
+10.211.55.15
+10.211.55.16
 
 [k8s-nodes]
-10.90.3.9
-10.90.3.169
-10.90.6.53
+10.211.55.15 hostname=node1 node_ip=10.211.55.15
+#10.211.55.16 hostname=node2 node_ip=10.211.55.16
 
 [k8s-cli]
-10.90.3.9
-
-[k8s-all]
-10.90.3.9 hostname=AWS-beeB-Docker1 node_ip=10.90.3.9
-10.90.3.169 hostname=AWS-beeB-Docker2 node_ip=10.90.3.169
-10.90.6.53 hostname=AWS-beeB-Docker3 node_ip=10.90.6.53
+10.211.55.15
 
 [all:vars]
-ansible_user=yanxiang.huang
+ansible_user=ubuntu
 ansible_become=true
-ansible_become_pass=quanshi123@
+ansible_become_pass=ubuntu
+
+[new-nodes]
+10.211.55.16 hostname=node2 node_ip=10.211.55.16

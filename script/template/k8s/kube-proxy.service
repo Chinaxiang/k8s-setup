@@ -1,10 +1,10 @@
 description "kube-proxy daemon"
 
-start on startup
-stop on shutdown
+start on (filesystem and net-device-up IFACE!=lo)
+stop on runlevel [!2345]
 
 respawn
-respawn limit 2 5
+respawn limit 5 10
 console output
 
 script

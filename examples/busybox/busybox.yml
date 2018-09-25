@@ -6,7 +6,7 @@ metadata:
   labels:
     k8s-app: busybox
 spec:
-  replicas: 1
+  replicas: 2
   template:
     metadata:
       labels:
@@ -16,7 +16,7 @@ spec:
       terminationGracePeriodSeconds: 0
       restartPolicy: Always
       containers:
-      - image: busybox
+      - image: 192.168.83.123/infra/busybox
         name: busybox
         imagePullPolicy: IfNotPresent
         command:
