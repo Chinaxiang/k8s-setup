@@ -1,5 +1,7 @@
 # k8s集群部署
 
+此项目已过期。
+
 二进制压缩包：
 
 https://pan.baidu.com/s/1hsZViQw
